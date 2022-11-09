@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package v1;
+
+import "errors/errors.proto";
+
+option go_package = "api/v1;v1";
+
+enum ErrorReason {
+  // 设置缺省错误码
+  option (errors.default_code) = 500;
+
+  // 未知错误
+  UNKNOWN_ERROR = 0;
+  // 服务异常
+  SERVER_ERROR = 100001 [(errors.code) = 500];
+}
