@@ -1,13 +1,26 @@
 syntax = "proto3";
-package kratos.api;
+package api.config;
 
-option go_package = "mt/internal/conf;conf";
+option go_package = "api/config;config";
 
 import "google/protobuf/duration.proto";
 
 message Bootstrap {
-  Server server = 1;
-  Data data = 2;
+  string environment = 1;
+  App app = 2;
+  Server server = 3;
+  Data data = 4;
+  Jwt jwt = 5;
+  Datetime datetime = 6;
+  Language language = 7;
+  Validator validator = 8;
+  Log log = 9;
+}
+
+message App {
+  string id = 1;
+  string name = 2;
+  string version = 3;
 }
 
 message Server {
@@ -27,8 +40,7 @@ message Server {
 
 message Data {
   message Database {
-    string driver = 1;
-    string source = 2;
+    Db default = 1;
   }
   message Redis {
     string network = 1;
@@ -38,4 +50,49 @@ message Data {
   }
   Database database = 1;
   Redis redis = 2;
+}
+
+message Db {
+  string dsn = 1;
+  string driver = 2;
+  string dbname = 3;
+  string host = 4;
+  string username = 5;
+  string password = 6;
+  string charset = 7;
+  int64  port = 8;
+  string prefix = 9;
+  int64  max_idle_conn = 10;
+  int64  max_open_conn = 11;
+  int64  max_life_time = 12;
+  string parse_time = 13;
+  string loc = 14;
+}
+
+message Jwt {
+  string app = 1;
+  string key = 2;
+  string secret = 3;
+}
+
+message Datetime {
+  string location = 1;
+  string cst_layout = 2;
+}
+
+message Language {
+  string local = 1;
+}
+
+message Validator {
+  string locale = 1;
+  string tagname = 2;
+}
+
+message Log {
+  int32 max_size = 1;
+  int32 max_backups = 2;
+  int32 max_age = 3;
+  bool local_time = 4;
+  bool compress = 5;
 }

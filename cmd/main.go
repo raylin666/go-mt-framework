@@ -7,7 +7,7 @@ import (
 	"mt/config"
 
 	"github.com/go-kratos/kratos/v2"
-	"github.com/go-kratos/kratos/v2/config"
+	kratos_config "github.com/go-kratos/kratos/v2/config"
 	"github.com/go-kratos/kratos/v2/config/file"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
@@ -58,8 +58,8 @@ func main() {
 		"trace.id", tracing.TraceID(),
 		"span.id", tracing.SpanID(),
 	)
-	c := config.New(
-		config.WithSource(
+	c := kratos_config.New(
+		kratos_config.WithSource(
 			file.NewSource(flagconf),
 		),
 	)
@@ -69,7 +69,7 @@ func main() {
 		panic(err)
 	}
 
-	var bc conf.Bootstrap
+	var bc config.Bootstrap
 	if err := c.Scan(&bc); err != nil {
 		panic(err)
 	}
