@@ -40,19 +40,16 @@ message Server {
 
 message Data {
   message Database {
-    Db default = 1;
+    DatabaseItem default = 1;
   }
   message Redis {
-    string network = 1;
-    string addr = 2;
-    google.protobuf.Duration read_timeout = 3;
-    google.protobuf.Duration write_timeout = 4;
+    RedisItem default = 1;
   }
   Database database = 1;
   Redis redis = 2;
 }
 
-message Db {
+message DatabaseItem {
   string dsn = 1;
   string driver = 2;
   string dbname = 3;
@@ -67,6 +64,28 @@ message Db {
   int64  max_life_time = 12;
   string parse_time = 13;
   string loc = 14;
+}
+
+message RedisItem {
+  string network = 1;
+  string addr = 2;
+  int64 port = 3;
+  string username = 4;
+  string password = 5;
+  int32 db = 6;
+  int32 max_retries = 7;
+  int64 min_retry_backoff = 8;
+  int64 max_retry_backoff = 9;
+  int64 dial_timeout = 10;
+  int64 read_timeout = 11;
+  int64 write_timeout = 12;
+  bool pool_fifo = 13;
+  int32 pool_size = 14;
+  int64 min_idle_conns = 15;
+  int64 max_conn_age = 16;
+  int64 pool_timeout = 17;
+  int64 idle_timeout = 18;
+  int64 idle_check_frequency = 19;
 }
 
 message Jwt {

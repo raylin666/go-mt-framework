@@ -2,21 +2,20 @@ package data
 
 import (
 	"context"
+	"mt/pkg/logger"
 
 	"mt/internal/biz"
-
-	"github.com/go-kratos/kratos/v2/log"
 )
 
 type heartbeatRepo struct {
 	data *Data
-	log  *log.Helper
+	log  *logger.Logger
 }
 
-func NewHeartbeatRepo(data *Data, logger log.Logger) biz.HeartbeatRepo {
+func NewHeartbeatRepo(data *Data, logger *logger.Logger) biz.HeartbeatRepo {
 	return &heartbeatRepo{
 		data: data,
-		log:  log.NewHelper(logger),
+		log:  logger,
 	}
 }
 

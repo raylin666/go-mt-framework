@@ -2,7 +2,7 @@ package biz
 
 import (
 	"context"
-	"github.com/go-kratos/kratos/v2/log"
+	"mt/pkg/logger"
 )
 
 type Heartbeat struct {
@@ -14,11 +14,11 @@ type HeartbeatRepo interface {
 
 type HeartbeatUsecase struct {
 	repo HeartbeatRepo
-	log  *log.Helper
+	log  *logger.Logger
 }
 
-func NewHeartbeatUsecase(repo HeartbeatRepo, logger log.Logger) *HeartbeatUsecase {
-	return &HeartbeatUsecase{repo: repo, log: log.NewHelper(logger)}
+func NewHeartbeatUsecase(repo HeartbeatRepo, logger *logger.Logger) *HeartbeatUsecase {
+	return &HeartbeatUsecase{repo: repo, log: logger}
 }
 
 func (uc *HeartbeatUsecase) PONE(ctx context.Context) error {

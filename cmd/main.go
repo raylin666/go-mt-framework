@@ -15,7 +15,6 @@ import (
 	"github.com/go-kratos/kratos/v2"
 	kratos_config "github.com/go-kratos/kratos/v2/config"
 	"github.com/go-kratos/kratos/v2/config/file"
-	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
 
@@ -38,7 +37,7 @@ func init() {
 	flag.StringVar(&flagconf, "conf", "../.env.yaml", "config path, eg: -conf .env.yaml")
 }
 
-func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
+func newApp(logger *pkg_logger.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
 	return kratos.New(
 		kratos.ID(ID),
 		kratos.Name(Name),
