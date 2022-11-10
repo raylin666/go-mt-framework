@@ -1,8 +1,12 @@
 package server
 
 import (
+	"github.com/go-kratos/kratos/v2/middleware/logging"
+	"github.com/go-kratos/kratos/v2/middleware/metadata"
 	"mt/api/v1"
 	"mt/config"
+	"mt/internal/middleware/auth"
+	"mt/internal/middleware/validate"
 	"mt/internal/service"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -15,6 +19,10 @@ func NewGRPCServer(c *config.Server, greeter *service.HeartbeatService, logger l
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),
+			validate.Validator(),
+			logging.Server(logger),
+			metadata.Server(),
+			auth.NewAuthServer(),
 		),
 	}
 	if c.Grpc.Network != "" {

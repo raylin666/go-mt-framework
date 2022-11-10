@@ -1,8 +1,13 @@
 package server
 
 import (
+	"github.com/go-kratos/kratos/v2/middleware/logging"
+	"github.com/go-kratos/kratos/v2/middleware/metadata"
+	"github.com/go-kratos/kratos/v2/middleware/validate"
 	"mt/api/v1"
 	"mt/config"
+	"mt/internal/middleware/auth"
+	"mt/internal/middleware/encode"
 	"mt/internal/service"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -15,7 +20,12 @@ func NewHTTPServer(c *config.Server, greeter *service.HeartbeatService, logger l
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
+			validate.Validator(),
+			logging.Server(logger),
+			metadata.Server(),
+			auth.NewAuthServer(),
 		),
+		http.ResponseEncoder(encode.ResponseEncoder),
 	}
 	if c.Http.Network != "" {
 		opts = append(opts, http.Network(c.Http.Network))

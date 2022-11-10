@@ -31,7 +31,7 @@
 | 目录 | 目录名称 | 目录描述 |
 | --- | --- | --- |
 | cmd | 项目启动 | 存放项目启动文件及依赖注入绑定 |
-| config | 配置文件 |  |
+| config | 配置文件 | ProtoBuf 协议格式管理配置 |
 | generate | 代码生成器 | 比如数据库查询器 |
 | internal | 内部文件 | 存放项目业务开发文件 |
 | pkg | 通用封装包 | 存放项目通用封装逻辑, 代码实现隔离项目内部业务 |
@@ -55,15 +55,14 @@
 
 > make run
 
-访问服务 `curl 127.0.0.1:10001/heartbeat` , 返回 `200` 状态码则表示成功。
+访问服务 `curl 127.0.0.1:10010/heartbeat` , 返回 `200` 状态码则表示成功。
 ```shell
 {
-    "trace_id": "b2401c9e-1f6f-4183-952a-b539ddabbb71",
-    "data": "PONE"
+    "message": "PONE"
 }
 ```
 
-也支持采用 `Dockerfile` 和 `docker-compose` 启动哦 ！
+同时也支持采用 `Dockerfile` 和 `docker-compose` 启动哦 ！
 
 ### 编译执行文件 (需要有 .git 提交版本, 你也可以修改 `Makefile` 文件来取消这个限制)
 
@@ -91,6 +90,27 @@
 1. 在 `internal/router`、`internal/api` 和 `internal/service` 模块分别复制 `heartbeat` 文件, 并依次重命名为新模块名称。
 2. 修改 `internal/router/router.go` 文件, 在结构体 `httpRouter.handle` 里添加新模块接口映射；然后在 `NewHTTPRouter` 里的注册处理器添加实例化；最后新增路由注册, 例如: `r.heartbeat(r.g.Group("/heartbeat"))` 。
 3. 此时新模块就创建好了, 运行项目就可以访问对应的路由～
+
+### JWT 权限验证
+
+中间件放在 `internal/middleware/auth/jwt.go` 文件, `NewAuthServer` 方法的 `Match` 调用用来进行<b>路由白名单过滤</b>, 可以用来指定路由是否需要经过权限验证, 代码示例:
+```go
+// NewAuthServer JWT Server 中间件
+func NewAuthServer() func(handler middleware.Handler) middleware.Handler {
+    return selector.Server(
+        // JWT 权限验证
+        JWTMiddlewareHandler(),
+    ).Match(func(ctx context.Context, operation string) bool {
+        // 路由白名单过滤 | 返回true表示需要处理权限验证, 返回false表示不需要处理权限验证
+		r, err := regexp.Compile("/v1.Account/Login")
+        if err != nil {
+            // 自定义错误处理
+            return true
+        }
+        return r.FindString(operation) != operation
+    }).Build()
+}
+```
 
 ### 数据库模块
 

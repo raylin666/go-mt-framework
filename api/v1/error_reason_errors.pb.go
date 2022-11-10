@@ -38,3 +38,185 @@ func IsServerError(err error) bool {
 func ErrorServerError(format string, args ...interface{}) *errors.Error {
 	return errors.New(500, ErrorReason_SERVER_ERROR.String(), fmt.Sprintf(format, args...))
 }
+
+// 数据校验失败
+func IsDataValidateError(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_DATA_VALIDATE_ERROR.String() && e.Code == 422
+}
+
+// 数据校验失败
+func ErrorDataValidateError(format string, args ...interface{}) *errors.Error {
+	return errors.New(422, ErrorReason_DATA_VALIDATE_ERROR.String(), fmt.Sprintf(format, args...))
+}
+
+// 数据查询失败
+func IsDataSelectError(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_DATA_SELECT_ERROR.String() && e.Code == 400
+}
+
+// 数据查询失败
+func ErrorDataSelectError(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, ErrorReason_DATA_SELECT_ERROR.String(), fmt.Sprintf(format, args...))
+}
+
+// 数据已存在
+func IsDataAlreadyExists(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_DATA_ALREADY_EXISTS.String() && e.Code == 400
+}
+
+// 数据已存在
+func ErrorDataAlreadyExists(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, ErrorReason_DATA_ALREADY_EXISTS.String(), fmt.Sprintf(format, args...))
+}
+
+// 数据不存在
+func IsDataNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_DATA_NOT_FOUND.String() && e.Code == 400
+}
+
+// 数据不存在
+func ErrorDataNotFound(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, ErrorReason_DATA_NOT_FOUND.String(), fmt.Sprintf(format, args...))
+}
+
+// 新增数据失败
+func IsDataAddError(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_DATA_ADD_ERROR.String() && e.Code == 400
+}
+
+// 新增数据失败
+func ErrorDataAddError(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, ErrorReason_DATA_ADD_ERROR.String(), fmt.Sprintf(format, args...))
+}
+
+// 更新数据失败
+func IsDataUpdateError(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_DATA_UPDATE_ERROR.String() && e.Code == 400
+}
+
+// 更新数据失败
+func ErrorDataUpdateError(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, ErrorReason_DATA_UPDATE_ERROR.String(), fmt.Sprintf(format, args...))
+}
+
+// 数据删除失败
+func IsDataDeleteError(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_DATA_DELETE_ERROR.String() && e.Code == 400
+}
+
+// 数据删除失败
+func ErrorDataDeleteError(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, ErrorReason_DATA_DELETE_ERROR.String(), fmt.Sprintf(format, args...))
+}
+
+// 数据资源不存在
+func IsDataResourceNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_DATA_RESOURCE_NOT_FOUND.String() && e.Code == 400
+}
+
+// 数据资源不存在
+func ErrorDataResourceNotFound(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, ErrorReason_DATA_RESOURCE_NOT_FOUND.String(), fmt.Sprintf(format, args...))
+}
+
+// 数据属性更新失败
+func IsDataUpdateFieldError(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_DATA_UPDATE_FIELD_ERROR.String() && e.Code == 400
+}
+
+// 数据属性更新失败
+func ErrorDataUpdateFieldError(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, ErrorReason_DATA_UPDATE_FIELD_ERROR.String(), fmt.Sprintf(format, args...))
+}
+
+// 无效ID值
+func IsIdInvalidValueError(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_ID_INVALID_VALUE_ERROR.String() && e.Code == 400
+}
+
+// 无效ID值
+func ErrorIdInvalidValueError(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, ErrorReason_ID_INVALID_VALUE_ERROR.String(), fmt.Sprintf(format, args...))
+}
+
+// 无效的执行指令
+func IsCommandInvalidNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_COMMAND_INVALID_NOT_FOUND.String() && e.Code == 400
+}
+
+// 无效的执行指令
+func ErrorCommandInvalidNotFound(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, ErrorReason_COMMAND_INVALID_NOT_FOUND.String(), fmt.Sprintf(format, args...))
+}
+
+// 请先登录后再操作
+func IsNotLoginError(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_NOT_LOGIN_ERROR.String() && e.Code == 401
+}
+
+// 请先登录后再操作
+func ErrorNotLoginError(format string, args ...interface{}) *errors.Error {
+	return errors.New(401, ErrorReason_NOT_LOGIN_ERROR.String(), fmt.Sprintf(format, args...))
+}
+
+// 没有访问权限
+func IsNotVisitAuth(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_NOT_VISIT_AUTH.String() && e.Code == 401
+}
+
+// 没有访问权限
+func ErrorNotVisitAuth(format string, args ...interface{}) *errors.Error {
+	return errors.New(401, ErrorReason_NOT_VISIT_AUTH.String(), fmt.Sprintf(format, args...))
+}
