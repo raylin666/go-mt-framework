@@ -1,6 +1,7 @@
 package data
 
 import (
+	"fmt"
 	"mt/config"
 	"mt/pkg/logger"
 	"mt/pkg/repositories"
@@ -24,7 +25,11 @@ type Data struct {
 // NewData .
 func NewData(c *config.Data, logger *logger.Logger, repo repositories.DataRepo) (*Data, func(), error) {
 	cleanup := func() {
-		logger.UseApp().Info("closing the data resources")
+		// 资源关闭
+		repo.DB(repositories.DB_CONNECTION_DEFAULT_NAME).Close()
+		logger.UseApp().Info(fmt.Sprintf("closing the data resource: %s db.repo.", repositories.DB_CONNECTION_DEFAULT_NAME))
+		repo.Redis(repositories.REDIS_CONNECTION_DEFAULT_NAME).Close()
+		logger.UseApp().Info(fmt.Sprintf("closing the data resource: %s redis.repo.", repositories.REDIS_CONNECTION_DEFAULT_NAME))
 	}
 
 	return &Data{
