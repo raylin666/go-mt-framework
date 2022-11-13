@@ -16,7 +16,7 @@ import (
 )
 
 // NewHTTPServer new a HTTP server.
-func NewHTTPServer(c *config.Server, greeter *service.HeartbeatService, logger *logger.Logger) *http.Server {
+func NewHTTPServer(c *config.Server, heartbeat *service.HeartbeatService, logger *logger.Logger) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
@@ -37,6 +37,6 @@ func NewHTTPServer(c *config.Server, greeter *service.HeartbeatService, logger *
 		opts = append(opts, http.Timeout(c.Http.Timeout.AsDuration()))
 	}
 	srv := http.NewServer(opts...)
-	v1.RegisterHeartbeatHTTPServer(srv, greeter)
+	v1.RegisterHeartbeatHTTPServer(srv, heartbeat)
 	return srv
 }

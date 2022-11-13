@@ -74,22 +74,25 @@
 
 ### 规范约束
 
-> `api` 处理层尽量避免使用 `配置(config)`、`数据仓库(dataRepo)`，职责上它只需要做 `数据校验` 和 `数据响应`。
+> `service` 服务层 `对应/对接到 ProtoBuf 协议`, 职责上它只负责 `请求数据规划` 、`调用 biz 业务逻辑层` 及 `包装响应数据`, 不做其他任何逻辑处理。
 
-> `pkg` 通用封装包内逻辑不允许调用 `internal` 内部包代码, 实现代码逻辑隔离, 也避免调用外部代码导致耦合。
+> `biz` 逻辑层主要负责 `逻辑分工` 、`数据层调用` 及 `各数据块组装`, 返回给响应数据到服务层。
 
-> `data` 数据层主要处理业务数据仓库的实例, 数据库逻辑处理、缓存逻辑处理、RPC 远程调用处理等相关操作。
+> `data` 数据层主要处理业务 `数据仓库` 的实例, `数据库逻辑处理`、`缓存逻辑处理`、`RPC 远程调用处理` 等相关操作。
 
-> 逻辑方法的异常情况统一返回 `errors.BusinessError`, 调用异常时统一使用 `internal/constant/errcode/errors.go` 内的变量。
+> `pkg` 通用封装包内逻辑不允许调用 `internal` 内部包代码, 实现代码逻辑隔离, 也避免调用外部代码导致耦合和环境污染。
 
-> 调用关系链: (处理层) `api` -> (逻辑层) `service` -> (数据层) `data` , 逻辑代码只能下沉, 注意不要互调哦 ～
+> 异常处理统一调用 `internal/constant/defined/errors.go` 内的变量, 该文件的所有变量都将对接到 `api` 层 `ProtoBuf 协议` 的 `error_reason.proto` 文件定义。
+
+> 调用关系链: (服务层) `service` -> (业务逻辑层) `biz` -> (数据层) `data` , 逻辑代码只能下沉, 注意不要互调哦 ～
 
 ### 创建新模块
 
-> 以 `heartbeat` 为例:
-1. 在 `internal/router`、`internal/api` 和 `internal/service` 模块分别复制 `heartbeat` 文件, 并依次重命名为新模块名称。
-2. 修改 `internal/router/router.go` 文件, 在结构体 `httpRouter.handle` 里添加新模块接口映射；然后在 `NewHTTPRouter` 里的注册处理器添加实例化；最后新增路由注册, 例如: `r.heartbeat(r.g.Group("/heartbeat"))` 。
-3. 此时新模块就创建好了, 运行项目就可以访问对应的路由～
+> 以 `account` 为例:
+1. 复制 `api/v1/heartbeat.proto` 文件, 重命名为新模块名称, 编写API后执行 `make api` 命令生成API代码文件
+2. 分别复制 `internal/service`, `internal/biz`, `internal/data` 的 `heartbeat.go` 文件处理层级关系链, `internal/service` 下的文件方法对应 `api/v1` 下的服务方法, 参数也是保持一致。
+3. 处理完关系链后分别在 `internal/service/service.go`, `internal/biz/biz.go`, `internal/data/data.go` 文件的 `wire.NewSet` 方法绑定, 然后执行 `make wire` 命令更新依赖注入文件
+4. 分别在 `internal/server/grpc.go` 和 `internal/server/http.go` 的参数添加服务, 然后分别调用类似 `v1.RegisterHeartbeatServer(srv, heartbeat)` 方法和调用 `v1.RegisterHeartbeatHTTPServer(srv, heartbeat)` 方法将服务注册即可～
 
 ### JWT 权限验证
 
@@ -164,132 +167,36 @@ g.ApplyInterface(func(method method.Account) {}, accountModel)
 5. 在 `internal/repositories/dbrepo/query.go` 文件中增加如下代码, 方便默认查询调用:
 ```go
 // NewDefaultDbQuery 创建默认数据库查询
-func NewDefaultDbQuery(dbInterface db.Db) *query.Query {
-	return query.Use(dbInterface.Get().DB())
+func NewDefaultDbQuery(dbRepo repositories.DbRepo) *query.Query {
+return query.Use(dbRepo.DB(repositories.DB_CONNECTION_DEFAULT_NAME).Get().DB())
 }
 ```
 
 ### 数据层处理
 
-该层的设计目的是 <b>解藕数据与业务逻辑</b> 代码, 使层级更清晰, 服务逻辑层不再不需要引入 `DataRepo` 来处理数据逻辑，只需要专心处理业务逻辑即可。当业务复杂、多人协作开发、功能模块多的项目强烈建议采用数据层来降低后期维护成本。
+该层的设计目的是 <b>解藕数据与业务逻辑</b> 代码, 使层级更清晰, 业务逻辑层 `biz` 不需要引入 `repo` 来处理数据逻辑，通过接口方式类似 `HeartbeatRepo` 访问到数据层, 只需要专心处理业务逻辑即可。当业务复杂、多人协作开发、功能模块多的项目强烈建议采用数据层来降低后期维护成本。
+具体的 `CURD` 操作文档请参考 `gorm`: <a href="https://gorm.io/zh_CN/">https://gorm.io/zh_CN/</a>
+
 
 > 依照如上 `account` 模型为例:
-1. 在服务逻辑层添加数据层调用代码, 打开 `internal/service/account.go` 文件, 修改内容如下：
-```shell
-// 在 import 之后添加数据层接口定义
+
+在数据层添加查询一行记录代码, 打开 `internal/data/account.go` 文件, 示例内容如下：
+```go
+func (r *accountRepo) First(ctx context.Context, id int) (*model.Account, error) {
+	var q = dbrepo.NewDefaultDbQuery(r.data.DbRepo)
+	return q.Account.WithContext(ctx).Where(q.Account.ID.Eq(id)).First()
+}
+```
+
+接下来只需要在 `internal/biz/account.go` 业务逻辑层定义接口, 然后调用该接口的方法即可, 定义接口方式:
+```go
 type AccountRepo interface {
-	ID(ctx context.Context, username string) int
+	// 获取一条数据
+    First(ctx context.Context, id int) (*model.Account, error)
 }
 
-// 在 AccountService 内添加数据层实例, 例如
-type AccountService struct {
-    logger *logger.Logger
-	repo   AccountRepo
-}
-
-// 在 NewAccountService 方法参数添加数据层实例及设置入服务逻辑层结构体的 repo, 例如
-func NewAccountService(logger *logger.Logger, repo AccountRepo) *AccountService {
-	return &AccountService{
-		logger: logger,
-		repo:   repo,
-	}
-}
-```
-
-2. 编写数据处理文件, 在 `internal/data` 目录创建 `account.go` 文件, 内容如下:
-```go
-package data
-
-import (
-	"context"
-	"ult/internal/constant/defined"
-	"ult/internal/repositories/dbrepo"
-	"ult/internal/service"
-	"ult/pkg/global"
-	"ult/pkg/logger"
-)
-
-type accountRepo struct {
-	repo   global.DataRepo
-	logger *logger.Logger
-}
-
-func NewAccountRepo(logger *logger.Logger, repo global.DataRepo) service.AccountRepo {
-	return &accountRepo{
-		logger: logger,
-		repo:   repo,
-	}
-}
-
-func (data *accountRepo) ID(ctx context.Context, username string) int {
-	var q = dbrepo.NewDefaultDbQuery(data.repo.DB(defined.DB_CONNECTION_DEFAULT_NAME))
-	res, err := q.Account.WithContext(ctx).FindByUserName(username)
-	if err != nil {
-		return 0
-	}
-
-	return res.ID
-}
-```
-
-3. 数据层定义各仓库实例化, 在 `internal/data/data/go` 文件中新增 `Account` , 内容如下：
-```shell
-// DataRepo 结构体新增 `Account`
-type DataRepo struct {
-	Account service.AccountRepo
-}
-
-// NewDataRepo 方法实例化 `Account`
-func NewDataRepo(logger *logger.Logger, repo global.DataRepo) *DataRepo {
-	return &DataRepo{
-		Account: NewAccountRepo(logger, repo),
-	}
-}
-```
-
-4. 服务逻辑层调用数据层, 在 `internal/router/router.go` 文件找到代码 `data.NewDataRepo(hs.Logger(), hs.DataRepo())`，修改为:
-```go
-var repo = data.NewDataRepo(hs.Logger(), hs.DataRepo())
-
-// 在注册处理器里的 `NewAccountService` 调用中添加参数 `repo.Account` 即可
-var r = &httpRouter{
-    // 创建路由组
-    g: hs.CreateRouterGroup(),
-    // 注册处理器
-    handle: struct {
-        Account api.AccountInterface
-    }{
-        Account: api.NewAccountHandler(hs.Logger(), service.NewAccountService(hs.Logger(), repo.Account)),
-    },
-}
-```
-
-接下来就可以在 `service` 服务逻辑层直接调用数据层咯～
-
-### 数据响应
-
-> 主要分为 `正常响应` 和 `异常响应`。
-
-1. 只能在 `api` 层处理, 否则将会导致项目规范凌乱, 无法管理。
-2. `ctx.WithAbortError` 抛出异常后记得 `return` 断言, 否则是会往下执行的。
-3. `ctx.WithPayload` 正常响应数据, 一般放在最后, 否则记得 `return` 断言, 否则也是会往下执行的。
-
-### 数据校验
-
-验证器组件文档: `https://github.com/go-playground/validator`
-数据验证几乎不需要你做啥, 只要定义好参数结构体, 然后在 `api` 层调用验证器即可。例如：
-```go
-type Account struct {
-    Id int `form:"id" label:"唯一值" validate:"numeric,min=1"`
-}
-
-var req = new(Account)
-if isErr := ctx.Validator(req); isErr {
-    return
-}
-
-// 如上的响应HTTP状态码为 422, 响应内容如下:
-// {"trace_id":"eab08d57-bd3f-48e6-99de-9dbcd14ecc33","code":100005,"message":"参数校验错误","desc":"唯一值必须是一个有效的数值"}
+// 调用方式
+uc.repo.First(ctx, 1)
 ```
 
 ### 异常处理/错误状态码
