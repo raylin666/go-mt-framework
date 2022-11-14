@@ -6,26 +6,6 @@
 
 当你所需命令不存在时可添加到此文件中, 实现命令统一管理。这也大大的提高了开发者的开发效率, 让开发者更专注于业务代码。 <br />
 
-### 集成组件
-
-| 名称 | 描述 | 
-| --- | --- |
-| cors | 接口跨域 |
-| pprof | 性能剖析 |
-| errno | 统一定义错误码 |
-| zap | 日志收集 |
-| gorm | 数据库组件 (支持 `gen` 和 `DIY` 生成文件) |
-| go-redis | redis 组件 |
-| JWT | 鉴权组件 |
-| validator | 数据校验 |
-| qiniu | 上传文件 |
-| uuid | 唯一值生成 |
-| dingTalk | 钉钉机器人 |
-| gomail | 邮件发送 |
-| wire | 依赖注入 |
-| yaml.v3 | 配置文件解析 |
-| RESTFUL API | API 返回值规范 |
-
 ### 目录介绍
 
 | 目录 | 目录名称 | 目录描述 |
@@ -198,20 +178,3 @@ type AccountRepo interface {
 // 调用方式
 uc.repo.First(ctx, 1)
 ```
-
-### 异常处理/错误状态码
-
-1. 为了统一规范, 基础错误状态码放置在 `pkg/code/code.go` 文件中, HTTP 状态码设置在 `pkg/code/errhttp.go` 文件中 (未设置的状态码 响应时默认是 `400`), 状态码提示分为中英文 `zh-cn` 和 `en-us`。
-2. 业务状态码放置在 `internal/constant/errcode/errcode.go` 文件中, HTTP 状态码设置在 `internal/constant/errcode/errhttp.go` 文件中 (未设置的状态码 响应时默认是 `400`), 状态码提示也分为中英文 `zh-cn` 和 `en-us`。
-3. 规范化的错误状态管理, 通过 `internal/constant/errcode/errors.go` 文件来定义错误, 抛出异常时只需要调用该变量即可实现, 避免了 普通错误码需要引用 `pkg` 包内的错误码, 而业务错误码则需要引用 `errcode` 包内的错误码, 导致调用极不统一的现象。
-4. 逻辑方法的异常情况统一为 `errors.BusinessError` 对象, 例如:
-```go
-func (h *AccountService) ID(ctx context.Context) errors.BusinessError {
-    if h.repo.ID(ctx) <= 0 {
-        return errcode.ErrorDataSelectError
-    }   
-    
-    return nil 
-}
-```
-
