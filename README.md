@@ -48,7 +48,7 @@
 
 > make build
 
-编译成功后, 可以通过 `./bin/server` 命令运行服务。
+编译成功后, 可以通过 `./bin/server -conf ./.env.yaml` 命令运行服务。
 
 <hr />
 
