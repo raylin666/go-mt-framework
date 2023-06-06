@@ -1,11 +1,11 @@
 package server
 
 import (
-	"github.com/go-kratos/kratos/v2/middleware/logging"
 	"github.com/go-kratos/kratos/v2/middleware/metadata"
 	"mt/api/v1"
 	"mt/config"
 	"mt/internal/middleware/auth"
+	logging "mt/internal/middleware/logger"
 	"mt/internal/middleware/validate"
 	"mt/internal/service"
 	"mt/pkg/logger"
@@ -20,8 +20,8 @@ func NewGRPCServer(c *config.Server, heartbeat *service.HeartbeatService, logger
 		grpc.Middleware(
 			recovery.Recovery(),
 			validate.Validator(),
-			logging.Server(logger),
 			metadata.Server(),
+			logging.Server(logger),
 			auth.NewAuthServer(),
 		),
 	}

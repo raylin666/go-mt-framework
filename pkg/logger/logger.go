@@ -1,8 +1,10 @@
 package logger
 
 import (
+	"context"
 	"fmt"
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-kratos/kratos/v2/metadata"
 	"github.com/raylin666/go-utils/logger"
 	"go.uber.org/zap"
 	"reflect"
@@ -52,20 +54,31 @@ func NewJSONLogger(opts ...logger.Option) (*Logger, error) {
 	return &Logger{zaplogger}, err
 }
 
-func (log *Logger) UseApp() *zap.Logger {
-	return log.Logger.Named(LogApp)
+func (log *Logger) UseApp(ctx context.Context) *zap.Logger {
+	var traceId string
+	if md, ok := metadata.FromServerContext(ctx); ok {
+		traceId = md.Get("x-md-trace-id")
+	}
+	return log.Logger.Named(LogApp).With(zap.String("trace_id", traceId))
 }
 
-func (log *Logger) UseSQL() *zap.Logger {
-	return log.Logger.Named(LogSQL)
+func (log *Logger) UseSQL(ctx context.Context) *zap.Logger {
+	var traceId string
+	if md, ok := metadata.FromServerContext(ctx); ok {
+		traceId = md.Get("x-md-trace-id")
+	}
+	return log.Logger.Named(LogSQL).With(zap.String("trace_id", traceId))
 }
 
-func (log *Logger) UseRequest() *zap.Logger {
-	return log.Logger.Named(LogRequest)
+func (log *Logger) UseRequest(ctx context.Context) *zap.Logger {
+	var traceId string
+	if md, ok := metadata.FromServerContext(ctx); ok {
+		traceId = md.Get("x-md-trace-id")
+	}
+	return log.Logger.Named(LogRequest).With(zap.String("trace_id", traceId))
 }
 
 type RequestLogFormat struct {
-	TraceId           string              `json:"trace_id"`
 	ClientIp          string              `json:"client_ip"`
 	Method            string              `json:"method"`
 	Path              string              `json:"path"`
@@ -78,16 +91,17 @@ type RequestLogFormat struct {
 	HttpCode          int                 `json:"http_code"`
 	BusinessCode      int                 `json:"business_code"`
 	BusinessMessage   string              `json:"business_message"`
+	Args              string              `json:"args"`
 	RequestTime       time.Time           `json:"request_time"`
 	ResponseTime      time.Time           `json:"response_time"`
 	CostSeconds       float64             `json:"cost_seconds"`
 }
 
 // RequestLog 打印请求日志
-func (log *Logger) RequestLog(rlf *RequestLogFormat, err error) {
+func (log *Logger) RequestLog(ctx context.Context, rlf *RequestLogFormat, err error) {
 	var types = reflect.TypeOf(rlf)
 	var values = reflect.ValueOf(rlf)
-	var zaplog = log.UseRequest()
+	var zaplog = log.UseRequest(ctx)
 	for i := 0; i < types.Elem().NumField(); i++ {
 		zaplog = zaplog.With(zap.Any(types.Elem().Field(i).Tag.Get("json"), values.Elem().Field(i).Interface()))
 	}

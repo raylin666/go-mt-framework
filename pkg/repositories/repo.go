@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"context"
 	"fmt"
 	"go.uber.org/zap"
 	"mt/config"
@@ -24,11 +25,13 @@ type dataRepo struct {
 }
 
 func NewDataRepo(logger *logger.Logger, conf *config.Data) DataRepo {
-	var dbRepo = new(dbRepo)
-	var redisRepo = new(redisRepo)
-	var repo = new(dataRepo)
-
 	var (
+		ctx = context.Background()
+
+		dbRepo    = new(dbRepo)
+		redisRepo = new(redisRepo)
+		repo      = new(dataRepo)
+
 		dbMap    = make(map[string]*config.DatabaseItem, 1)
 		redisMap = make(map[string]*config.RedisItem, 1)
 	)
@@ -45,16 +48,16 @@ func NewDataRepo(logger *logger.Logger, conf *config.Data) DataRepo {
 		for dbName, dbConfig := range dbMap {
 			rdb, err := db.NewDb(dbName, dbConfig, logger)
 			if err != nil {
-				logger.UseApp().Error(fmt.Sprintf("init db.repo %s error", dbName), zap.Error(err))
+				logger.UseApp(ctx).Error(fmt.Sprintf("init db.repo %s error", dbName), zap.Error(err))
 			} else {
-				logger.UseApp().Info(fmt.Sprintf("init db.repo %s success", dbName))
+				logger.UseApp(ctx).Info(fmt.Sprintf("init db.repo %s success", dbName))
 				dbRepo.resource[dbName] = rdb
 			}
 		}
 
 		repo.db = dbRepo
 	} else {
-		logger.UseApp().Warn("Currently not db.repo connected.")
+		logger.UseApp(ctx).Warn("Currently not db.repo connected.")
 	}
 
 	// 初始化 Redis
@@ -69,16 +72,16 @@ func NewDataRepo(logger *logger.Logger, conf *config.Data) DataRepo {
 		for redisName, redisConfig := range redisMap {
 			redis, err := cache.NewRedis(redisName, redisConfig)
 			if err != nil {
-				logger.UseApp().Error(fmt.Sprintf("init redis.repo %s error", redisName), zap.Error(err))
+				logger.UseApp(ctx).Error(fmt.Sprintf("init redis.repo %s error", redisName), zap.Error(err))
 			} else {
-				logger.UseApp().Info(fmt.Sprintf("init redis.repo %s success", redisName))
+				logger.UseApp(ctx).Info(fmt.Sprintf("init redis.repo %s success", redisName))
 				redisRepo.resource[redisName] = redis
 			}
 		}
 
 		repo.redis = redisRepo
 	} else {
-		logger.UseApp().Warn("Currently not redis.repo connected.")
+		logger.UseApp(ctx).Warn("Currently not redis.repo connected.")
 	}
 
 	return repo
