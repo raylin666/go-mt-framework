@@ -3,7 +3,7 @@ package repositories
 import "mt/pkg/db"
 
 const (
-	DB_CONNECTION_DEFAULT_NAME = "default"
+	DbConnectionDefaultName = "default"
 )
 
 var _ DbRepo = (*dbRepo)(nil)

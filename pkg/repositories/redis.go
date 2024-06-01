@@ -3,7 +3,7 @@ package repositories
 import "mt/pkg/cache"
 
 const (
-	REDIS_CONNECTION_DEFAULT_NAME = "default"
+	RedisConnectionDefaultName = "default"
 )
 
 var _ RedisRepo = (*redisRepo)(nil)

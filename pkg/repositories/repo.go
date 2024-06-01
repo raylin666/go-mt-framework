@@ -39,7 +39,7 @@ func NewDataRepo(logger *logger.Logger, conf *config.Data) DataRepo {
 	// 初始化数据库
 	var database = conf.GetDatabase()
 	if database.GetDefault() != nil {
-		dbMap[DB_CONNECTION_DEFAULT_NAME] = database.GetDefault()
+		dbMap[DbConnectionDefaultName] = database.GetDefault()
 	}
 
 	lenDatabase := len(dbMap)
@@ -63,7 +63,7 @@ func NewDataRepo(logger *logger.Logger, conf *config.Data) DataRepo {
 	// 初始化 Redis
 	var redis = conf.GetRedis()
 	if redis.GetDefault() != nil {
-		redisMap[REDIS_CONNECTION_DEFAULT_NAME] = redis.GetDefault()
+		redisMap[RedisConnectionDefaultName] = redis.GetDefault()
 	}
 
 	lenRedis := len(redisMap)
