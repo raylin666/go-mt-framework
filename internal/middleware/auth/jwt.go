@@ -12,16 +12,16 @@ import (
 
 const (
 	// AccessToken Headers 头权限认证参数名称
-	AccessToken      = "Access-Token"
+	AccessToken = "Access-Token"
 	// AccessTokenID Context 上下文切换保存的权限认证ID名称
-	AccessTokenID    = "Access-Token-ID"
+	AccessTokenID = "Access-Token-ID"
 
 	// XMdGlobalJwtName Metadata 元数据传递保存的全局权限认证参数名称
 	XMdGlobalJwtName = "x-md-global-jwt"
 )
 
-// NewAuthServer JWT Server 中间件
-func NewAuthServer() func(handler middleware.Handler) middleware.Handler {
+// NewJWTAuthServer JWT Server 中间件
+func NewJWTAuthServer() func(handler middleware.Handler) middleware.Handler {
 	return selector.Server(
 		// JWT 权限验证
 		JWTMiddlewareHandler(),
@@ -60,7 +60,7 @@ func JWTMiddlewareHandler() func(handler middleware.Handler) middleware.Handler 
 
 			// 权限验证及保存 Token 到上下文切换
 			var lenAud = len(jwtClaims.Audience)
-			if (lenAud <= 0) {
+			if lenAud <= 0 {
 				return nil, defined.ErrorNotVisitAuth
 			}
 			for i := 0; i < lenAud; i++ {

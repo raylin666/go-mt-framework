@@ -22,7 +22,7 @@ func NewGRPCServer(c *config.Server, heartbeat *service.HeartbeatService, logger
 			validate.Validator(),
 			metadata.Server(),
 			logging.Server(logger),
-			auth.NewAuthServer(),
+			auth.NewJWTAuthServer(),
 		),
 	}
 	if c.Grpc.Network != "" {
