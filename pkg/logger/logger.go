@@ -11,17 +11,22 @@ import (
 	"time"
 )
 
+const (
+	mdKeyTraceId  = "x-md-trace-id"
+	logKeyTraceId = "trace_id"
+)
+
 var _ log.Logger = (*Logger)(nil)
 
-func (l *Logger) Log(level log.Level, keyvals ...interface{}) error {
-	if len(keyvals) == 0 || len(keyvals)%2 != 0 {
-		l.Logger.Warn(fmt.Sprint("Keyvals must appear in pairs: ", keyvals))
+func (l *Logger) Log(level log.Level, keyValues ...interface{}) error {
+	if len(keyValues) == 0 || len(keyValues)%2 != 0 {
+		l.Logger.Warn(fmt.Sprint("keyValues must appear in pairs: ", keyValues))
 		return nil
 	}
 
 	var data []zap.Field
-	for i := 0; i < len(keyvals); i += 2 {
-		data = append(data, zap.Any(fmt.Sprint(keyvals[i]), keyvals[i+1]))
+	for i := 0; i < len(keyValues); i += 2 {
+		data = append(data, zap.Any(fmt.Sprint(keyValues[i]), keyValues[i+1]))
 	}
 
 	switch level {
@@ -50,32 +55,32 @@ type Logger struct {
 }
 
 func NewJSONLogger(opts ...logger.Option) (*Logger, error) {
-	zaplogger, err := logger.NewJSONLogger(opts...)
-	return &Logger{zaplogger}, err
+	zapLogger, err := logger.NewJSONLogger(opts...)
+	return &Logger{zapLogger}, err
 }
 
-func (log *Logger) UseApp(ctx context.Context) *zap.Logger {
+func (l *Logger) UseApp(ctx context.Context) *zap.Logger {
 	var traceId string
 	if md, ok := metadata.FromServerContext(ctx); ok {
-		traceId = md.Get("x-md-trace-id")
+		traceId = md.Get(mdKeyTraceId)
 	}
-	return log.Logger.Named(LogApp).With(zap.String("trace_id", traceId))
+	return l.Logger.Named(LogApp).With(zap.String(logKeyTraceId, traceId))
 }
 
-func (log *Logger) UseSQL(ctx context.Context) *zap.Logger {
+func (l *Logger) UseSQL(ctx context.Context) *zap.Logger {
 	var traceId string
 	if md, ok := metadata.FromServerContext(ctx); ok {
-		traceId = md.Get("x-md-trace-id")
+		traceId = md.Get(mdKeyTraceId)
 	}
-	return log.Logger.Named(LogSQL).With(zap.String("trace_id", traceId))
+	return l.Logger.Named(LogSQL).With(zap.String(logKeyTraceId, traceId))
 }
 
-func (log *Logger) UseRequest(ctx context.Context) *zap.Logger {
+func (l *Logger) UseRequest(ctx context.Context) *zap.Logger {
 	var traceId string
 	if md, ok := metadata.FromServerContext(ctx); ok {
-		traceId = md.Get("x-md-trace-id")
+		traceId = md.Get(mdKeyTraceId)
 	}
-	return log.Logger.Named(LogRequest).With(zap.String("trace_id", traceId))
+	return l.Logger.Named(LogRequest).With(zap.String(logKeyTraceId, traceId))
 }
 
 type RequestLogFormat struct {
@@ -98,13 +103,13 @@ type RequestLogFormat struct {
 }
 
 // RequestLog 打印请求日志
-func (log *Logger) RequestLog(ctx context.Context, rlf *RequestLogFormat, err error) {
+func (l *Logger) RequestLog(ctx context.Context, rlf *RequestLogFormat, err error) {
 	var types = reflect.TypeOf(rlf)
 	var values = reflect.ValueOf(rlf)
-	var zaplog = log.UseRequest(ctx)
+	var zapLogger = l.UseRequest(ctx)
 	for i := 0; i < types.Elem().NumField(); i++ {
-		zaplog = zaplog.With(zap.Any(types.Elem().Field(i).Tag.Get("json"), values.Elem().Field(i).Interface()))
+		zapLogger = zapLogger.With(zap.Any(types.Elem().Field(i).Tag.Get("json"), values.Elem().Field(i).Interface()))
 	}
 
-	zaplog.With(zap.Error(err)).Info("REQUEST LOG")
+	zapLogger.With(zap.Error(err)).Info("请求日志")
 }
