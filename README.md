@@ -8,16 +8,16 @@
 
 ### 目录介绍
 
-| 目录 | 目录名称 | 目录描述 |
-| --- | --- | --- |
-| cmd | 项目启动 | 存放项目启动文件及依赖注入绑定 |
-| config | 配置文件 | ProtoBuf 协议格式管理配置 |
-| generate | 代码生成器 | 比如数据库查询器 |
-| internal | 内部文件 | 存放项目业务开发文件 |
-| pkg | 通用封装包 | 存放项目通用封装逻辑, 代码实现隔离项目内部业务 |
-| static | 静态文件 | 比如图片、描述性文件、数据库SQL等 |
-| bin | 运行文件 | |
-| runtime | 临时/暂存 文件 | 比如日志文件 |
+| 目录       | 目录名称     | 目录描述                     |
+|----------|----------|--------------------------|
+| cmd      | 项目启动     | 存放项目启动文件及依赖注入绑定          |
+| config   | 配置文件     | ProtoBuf 协议格式管理配置        |
+| generate | 代码生成器    | 比如数据库查询器                 |
+| internal | 内部文件     | 存放项目业务开发文件               |
+| pkg      | 通用封装包    | 存放项目通用封装逻辑, 代码实现隔离项目内部业务 |
+| static   | 静态文件     | 比如图片、描述性文件、数据库SQL等       |
+| bin      | 运行文件     |                          |
+| runtime  | 临时/暂存 文件 | 比如日志文件                   |
 
 ### 下载仓库
 
@@ -78,20 +78,24 @@
 
 中间件放在 `internal/middleware/auth/jwt.go` 文件, `NewAuthServer` 方法的 `Match` 调用用来进行<b>路由白名单过滤</b>, 可以用来指定路由是否需要经过权限验证, 代码示例:
 ```go
-// NewAuthServer JWT Server 中间件
-func NewAuthServer() func(handler middleware.Handler) middleware.Handler {
+// NewJWTAuthServer JWT Server 中间件
+func NewJWTAuthServer(jwt auth.JWT) func(handler middleware.Handler) middleware.Handler {
     return selector.Server(
         // JWT 权限验证
-        JWTMiddlewareHandler(),
+        JWTMiddlewareHandler(jwt),
     ).Match(func(ctx context.Context, operation string) bool {
         // 路由白名单过滤 | 返回true表示需要处理权限验证, 返回false表示不需要处理权限验证
-		r, err := regexp.Compile("/v1.Account/Login")
-        if err != nil {
-            // 自定义错误处理
-            return true
-        }
-        return r.FindString(operation) != operation
+        return false
     }).Build()
+}
+
+// JWTMiddlewareHandler JWT 中间件处理器
+func JWTMiddlewareHandler(jwt auth.JWT) func(handler middleware.Handler) middleware.Handler {
+    return func(handler middleware.Handler) middleware.Handler {
+        return func(ctx context.Context, req interface{}) (reply interface{}, err error) {
+			return nil, nil
+        }
+    }
 }
 ```
 
