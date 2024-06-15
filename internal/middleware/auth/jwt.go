@@ -5,8 +5,8 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware"
 	"github.com/go-kratos/kratos/v2/middleware/selector"
 	"github.com/go-kratos/kratos/v2/transport"
+	"github.com/raylin666/go-utils/auth"
 	"google.golang.org/grpc/metadata"
-	"mt/internal/app"
 	"mt/internal/constant/defined"
 )
 
@@ -21,10 +21,10 @@ const (
 )
 
 // NewJWTAuthServer JWT Server 中间件
-func NewJWTAuthServer() func(handler middleware.Handler) middleware.Handler {
+func NewJWTAuthServer(jwt auth.JWT) func(handler middleware.Handler) middleware.Handler {
 	return selector.Server(
 		// JWT 权限验证
-		JWTMiddlewareHandler(),
+		JWTMiddlewareHandler(jwt),
 	).Match(func(ctx context.Context, operation string) bool {
 		// 路由白名单过滤 | 返回true表示需要处理权限验证, 返回false表示不需要处理权限验证
 		return false
@@ -32,7 +32,7 @@ func NewJWTAuthServer() func(handler middleware.Handler) middleware.Handler {
 }
 
 // JWTMiddlewareHandler JWT 中间件处理器
-func JWTMiddlewareHandler() func(handler middleware.Handler) middleware.Handler {
+func JWTMiddlewareHandler(jwt auth.JWT) func(handler middleware.Handler) middleware.Handler {
 	return func(handler middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, req interface{}) (reply interface{}, err error) {
 			var jwtToken string
@@ -52,7 +52,7 @@ func JWTMiddlewareHandler() func(handler middleware.Handler) middleware.Handler 
 				// 缺少可认证的 TOKEN，返回错误
 				return nil, defined.ErrorNotLoginError
 			}
-			jwtClaims, err := app.JWT.ParseToken(jwtToken)
+			jwtClaims, err := jwt.ParseToken(jwtToken)
 			if err != nil {
 				// 缺少合法的 TOKEN，返回错误
 				return nil, defined.ErrorNotLoginError

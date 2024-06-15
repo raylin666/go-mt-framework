@@ -2,20 +2,19 @@ package data
 
 import (
 	"context"
-	"mt/pkg/logger"
-
+	"mt/internal/app"
 	"mt/internal/biz"
 )
 
 type heartbeatRepo struct {
-	data *Data
-	log  *logger.Logger
+	data  *Data
+	tools *app.Tools
 }
 
-func NewHeartbeatRepo(data *Data, logger *logger.Logger) biz.HeartbeatRepo {
+func NewHeartbeatRepo(data *Data, tools *app.Tools) biz.HeartbeatRepo {
 	return &heartbeatRepo{
-		data: data,
-		log:  logger,
+		data:  data,
+		tools: tools,
 	}
 }
 

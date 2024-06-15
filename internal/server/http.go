@@ -2,28 +2,27 @@ package server
 
 import (
 	"github.com/go-kratos/kratos/v2/middleware/metadata"
+	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/middleware/validate"
+	"github.com/go-kratos/kratos/v2/transport/http"
 	"mt/api/v1"
 	"mt/config"
+	"mt/internal/app"
 	"mt/internal/middleware/auth"
 	"mt/internal/middleware/encode"
 	logging "mt/internal/middleware/logger"
 	"mt/internal/service"
-	"mt/pkg/logger"
-
-	"github.com/go-kratos/kratos/v2/middleware/recovery"
-	"github.com/go-kratos/kratos/v2/transport/http"
 )
 
 // NewHTTPServer new a HTTP server.
-func NewHTTPServer(c *config.Server, heartbeat *service.HeartbeatService, logger *logger.Logger) *http.Server {
+func NewHTTPServer(c *config.Server, heartbeat *service.HeartbeatService, tools *app.Tools) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
 			validate.Validator(),
 			metadata.Server(),
-			logging.Server(logger),
-			auth.NewJWTAuthServer(),
+			logging.Server(tools.Logger()),
+			auth.NewJWTAuthServer(tools.JWT()),
 		),
 		http.ResponseEncoder(encode.ResponseEncoder),
 	}

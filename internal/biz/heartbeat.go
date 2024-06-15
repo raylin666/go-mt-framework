@@ -2,7 +2,7 @@ package biz
 
 import (
 	"context"
-	"mt/pkg/logger"
+	"mt/internal/app"
 )
 
 type Heartbeat struct {
@@ -13,12 +13,12 @@ type HeartbeatRepo interface {
 }
 
 type HeartbeatUsecase struct {
-	repo HeartbeatRepo
-	log  *logger.Logger
+	repo  HeartbeatRepo
+	tools *app.Tools
 }
 
-func NewHeartbeatUsecase(repo HeartbeatRepo, logger *logger.Logger) *HeartbeatUsecase {
-	return &HeartbeatUsecase{repo: repo, log: logger}
+func NewHeartbeatUsecase(repo HeartbeatRepo, tools *app.Tools) *HeartbeatUsecase {
+	return &HeartbeatUsecase{repo: repo, tools: tools}
 }
 
 func (uc *HeartbeatUsecase) PONE(ctx context.Context) error {

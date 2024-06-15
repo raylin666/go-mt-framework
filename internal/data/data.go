@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"mt/config"
-	"mt/pkg/logger"
+	"mt/internal/app"
 	"mt/pkg/repositories"
 
 	"github.com/google/wire"
@@ -13,8 +13,12 @@ import (
 // ProviderSet is data providers.
 var ProviderSet = wire.NewSet(
 	NewData,
-	repositories.NewDataRepo,
+	NewDataRepo,
 	NewHeartbeatRepo)
+
+func NewDataRepo(tools *app.Tools, data *config.Data) repositories.DataRepo {
+	return repositories.NewDataRepo(tools.Logger(), data)
+}
 
 // Data .
 type Data struct {
@@ -24,14 +28,14 @@ type Data struct {
 }
 
 // NewData .
-func NewData(c *config.Data, logger *logger.Logger, repo repositories.DataRepo) (*Data, func(), error) {
+func NewData(tools *app.Tools, repo repositories.DataRepo) (*Data, func(), error) {
 	var ctx = context.Background()
 	cleanup := func() {
 		// 资源关闭
 		repo.DB(repositories.DbConnectionDefaultName).Close()
-		logger.UseApp(ctx).Info(fmt.Sprintf("closing the data resource: %s db.repo.", repositories.DbConnectionDefaultName))
+		tools.Logger().UseApp(ctx).Info(fmt.Sprintf("closing the data resource: %s db.repo.", repositories.DbConnectionDefaultName))
 		repo.Redis(repositories.RedisConnectionDefaultName).Close()
-		logger.UseApp(ctx).Info(fmt.Sprintf("closing the data resource: %s redis.repo.", repositories.RedisConnectionDefaultName))
+		tools.Logger().UseApp(ctx).Info(fmt.Sprintf("closing the data resource: %s redis.repo.", repositories.RedisConnectionDefaultName))
 	}
 
 	return &Data{

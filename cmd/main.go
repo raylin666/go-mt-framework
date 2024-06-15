@@ -37,13 +37,13 @@ func init() {
 	flag.StringVar(&flagconf, "conf", "../.env.yaml", "config path, eg: -conf .env.yaml")
 }
 
-func newApp(logger *pkg_logger.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
+func newApp(tools *app.Tools, gs *grpc.Server, hs *http.Server) *kratos.App {
 	return kratos.New(
 		kratos.ID(ID),
 		kratos.Name(Name),
 		kratos.Version(Version),
 		kratos.Metadata(map[string]string{}),
-		kratos.Logger(logger),
+		kratos.Logger(tools.Logger()),
 		kratos.Server(
 			gs,
 			hs,
@@ -82,12 +82,12 @@ func main() {
 	bc.Environment = env.Value()
 
 	// 初始化 Datetime
-	app.Datetime = system.NewDatetime(
+	var datetime = system.NewDatetime(
 		system.WithLocation(bc.Datetime.Location),
 		system.WithCSTLayout(bc.Datetime.CstLayout))
 
 	// 初始化 JWT 鉴权认证
-	app.JWT = auth.NewJWT(bc.Jwt.App, bc.Jwt.Key, bc.Jwt.Secret)
+	var jwt = auth.NewJWT(bc.Jwt.App, bc.Jwt.Key, bc.Jwt.Secret)
 
 	// 初始化 Logger
 	logger, err := pkg_logger.NewJSONLogger(
@@ -107,7 +107,10 @@ func main() {
 		panic(err)
 	}
 
-	appMT, cleanup, err := wireApp(bc.Server, bc.Data, logger)
+	// 创建公共工具实例
+	var tools = app.NewTools(logger, datetime, jwt)
+
+	appMT, cleanup, err := wireApp(bc.Server, bc.Data, tools)
 	if err != nil {
 		panic(err)
 	}
