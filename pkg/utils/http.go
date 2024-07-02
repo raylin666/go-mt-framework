@@ -1,6 +1,10 @@
 package utils
 
-import "strings"
+import (
+	"github.com/go-kratos/kratos/v2/transport/http"
+	"net"
+	"strings"
+)
 
 const (
 	httpBaseContentType = "application"
@@ -29,4 +33,26 @@ func HttpContentSubtype(contentType string) string {
 		return ""
 	}
 	return contentType[left+1 : right]
+}
+
+// ClientIP 获取客户端IP地址
+func ClientIP(r *http.Request) string {
+	var ip string
+	for _, ip = range strings.Split(r.Header.Get("X-Forwarded-For"), ",") {
+		ip = strings.TrimSpace(ip)
+		if ip != "" {
+			return ip
+		}
+	}
+
+	ip = strings.TrimSpace(r.Header.Get("X-Real-IP"))
+	if ip != "" {
+		return ip
+	}
+
+	if ip, _, err := net.SplitHostPort(strings.TrimSpace(r.RemoteAddr)); err == nil {
+		return ip
+	}
+
+	return "127.0.0.1"
 }
