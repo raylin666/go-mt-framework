@@ -12,6 +12,7 @@ type DbRepo interface {
 	Count() int
 	Has(name string) bool
 	DB(name string) db.Db
+	All() map[string]db.Db
 }
 
 type dbRepo struct {
@@ -32,4 +33,8 @@ func (repo *dbRepo) Has(name string) bool {
 
 func (repo *dbRepo) DB(name string) db.Db {
 	return repo.resource[name]
+}
+
+func (repo *dbRepo) All() map[string]db.Db {
+	return repo.resource
 }

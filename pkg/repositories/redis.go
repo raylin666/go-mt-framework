@@ -1,6 +1,8 @@
 package repositories
 
-import "mt/pkg/cache"
+import (
+	"mt/pkg/cache"
+)
 
 const (
 	RedisConnectionDefaultName = "default"
@@ -12,6 +14,7 @@ type RedisRepo interface {
 	Count() int
 	Has(name string) bool
 	Redis(name string) cache.Redis
+	All() map[string]cache.Redis
 }
 
 type redisRepo struct {
@@ -32,4 +35,8 @@ func (repo *redisRepo) Has(name string) bool {
 
 func (repo *redisRepo) Redis(name string) cache.Redis {
 	return repo.resource[name]
+}
+
+func (repo *redisRepo) All() map[string]cache.Redis {
+	return repo.resource
 }
