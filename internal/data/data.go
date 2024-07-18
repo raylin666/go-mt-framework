@@ -32,10 +32,15 @@ func NewData(tools *app.Tools, repo repositories.DataRepo) (*Data, func(), error
 	var ctx = context.Background()
 	cleanup := func() {
 		// 资源关闭
-		repo.DB(repositories.DbConnectionDefaultName).Close()
-		tools.Logger().UseApp(ctx).Info(fmt.Sprintf("closing the data resource: %s db.repo.", repositories.DbConnectionDefaultName))
-		repo.Redis(repositories.RedisConnectionDefaultName).Close()
-		tools.Logger().UseApp(ctx).Info(fmt.Sprintf("closing the data resource: %s redis.repo.", repositories.RedisConnectionDefaultName))
+		for dbName, dbRepo := range repo.DbRepo().All() {
+			_ = dbRepo.Close()
+			tools.Logger().UseApp(ctx).Info(fmt.Sprintf("closing the data resource: %s db.repo.", dbName))
+		}
+
+		for redisName, redisRepo := range repo.RedisRepo().All() {
+			_ = redisRepo.Close()
+			tools.Logger().UseApp(ctx).Info(fmt.Sprintf("closing the data resource: %s db.repo.", redisName))
+		}
 	}
 
 	return &Data{
