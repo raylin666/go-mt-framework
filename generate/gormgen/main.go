@@ -8,7 +8,6 @@ import (
 	"github.com/raylin666/go-utils/server/system"
 	"mt/config"
 	genDb "mt/generate/gormgen/db"
-	"mt/internal/app"
 	"mt/pkg/db"
 	"mt/pkg/logger"
 	"mt/pkg/repositories"
@@ -42,19 +41,19 @@ func main() {
 	}
 
 	// 初始化 Datetime
-	app.Datetime = system.NewDatetime(
+	var datetime = system.NewDatetime(
 		system.WithLocation(bc.Datetime.Location),
 		system.WithCSTLayout(bc.Datetime.CstLayout))
 
 	log, err := logger.NewJSONLogger(
 		utils_logger.WithField(utils_logger.AppKey, bc.App.Name),
 		utils_logger.WithField(utils_logger.EnvironmentKey, bc.Environment),
-		utils_logger.WithTimeLayout(app.Datetime.CSTLayout()))
+		utils_logger.WithTimeLayout(datetime.CSTLayout()))
 	if err != nil {
 		panic(err)
 	}
 
-	defaultDB, err := db.NewDb(repositories.DB_CONNECTION_DEFAULT_NAME, bc.Data.Database.Default, log)
+	defaultDB, err := db.NewDb(repositories.DbConnectionDefaultName, bc.Data.Database.Default, log)
 	if err != nil {
 		panic(err)
 	}
