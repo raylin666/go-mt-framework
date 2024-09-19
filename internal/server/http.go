@@ -11,6 +11,7 @@ import (
 	"mt/internal/middleware/auth"
 	"mt/internal/middleware/encode"
 	logging "mt/internal/middleware/logger"
+	"mt/internal/middleware/request"
 	"mt/internal/service"
 )
 
@@ -21,6 +22,7 @@ func NewHTTPServer(c *config.Server, heartbeat *service.HeartbeatService, tools 
 			recovery.Recovery(),
 			validate.Validator(),
 			metadata.Server(),
+			request.Trace(),
 			logging.Server(tools.Logger()),
 			auth.NewJWTAuthServer(tools.JWT()),
 		),
