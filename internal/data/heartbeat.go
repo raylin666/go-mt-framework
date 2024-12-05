@@ -4,16 +4,17 @@ import (
 	"context"
 	"mt/internal/app"
 	"mt/internal/biz"
+	"mt/pkg/repositories"
 )
 
 type heartbeatRepo struct {
-	data  *Data
+	data  repositories.DataRepo
 	tools *app.Tools
 }
 
-func NewHeartbeatRepo(data *Data, tools *app.Tools) biz.HeartbeatRepo {
+func NewHeartbeatRepo(repo repositories.DataRepo, tools *app.Tools) biz.HeartbeatRepo {
 	return &heartbeatRepo{
-		data:  data,
+		data:  repo,
 		tools: tools,
 	}
 }

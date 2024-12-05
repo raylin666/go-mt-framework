@@ -50,7 +50,7 @@ func NewDataRepo(logger *logger.Logger, conf *config.Data) DataRepo {
 			if err != nil {
 				logger.UseApp(ctx).Error(fmt.Sprintf("init db.repo %s error", dbName), zap.Error(err))
 			} else {
-				logger.UseApp(ctx).Info(fmt.Sprintf("init db.repo %s success", dbName))
+				logger.UseApp(ctx).Info(fmt.Sprintf("init db.repo %s successfully", dbName))
 				dbRepo.resource[dbName] = rdb
 			}
 		}
@@ -74,7 +74,7 @@ func NewDataRepo(logger *logger.Logger, conf *config.Data) DataRepo {
 			if err != nil {
 				logger.UseApp(ctx).Error(fmt.Sprintf("init redis.repo %s error", redisName), zap.Error(err))
 			} else {
-				logger.UseApp(ctx).Info(fmt.Sprintf("init redis.repo %s success", redisName))
+				logger.UseApp(ctx).Info(fmt.Sprintf("init redis.repo %s successfully", redisName))
 				redisRepo.resource[redisName] = redis
 			}
 		}
