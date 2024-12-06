@@ -78,8 +78,8 @@ func main() {
 	app.NewLogo(&bc)
 
 	// 初始化 Environment
-	var env = system.NewEnvironment(bc.Environment)
-	bc.Environment = env.Value()
+	var environment = system.NewEnvironment(bc.Environment)
+	bc.Environment = environment.Value()
 
 	// 初始化 Datetime
 	var datetime = system.NewDatetime(
@@ -108,7 +108,7 @@ func main() {
 	}
 
 	// 创建公共工具实例
-	var tools = app.NewTools(logger, datetime, jwt)
+	var tools = app.NewTools(logger, datetime, environment, jwt)
 
 	appMT, cleanup, err := wireApp(bc.Server, bc.Data, tools)
 	if err != nil {
