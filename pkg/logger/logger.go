@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	mdKeyTraceId  = "x-md-trace-id"
-	logKeyTraceId = "trace_id"
+	XMdKeyTraceId = "x-md-trace-id"
+	LogKeyTraceId = "trace_id"
 )
 
 var _ log.Logger = (*Logger)(nil)
@@ -62,25 +62,25 @@ func NewJSONLogger(opts ...logger.Option) (*Logger, error) {
 func (l *Logger) UseApp(ctx context.Context) *zap.Logger {
 	var traceId string
 	if md, ok := metadata.FromServerContext(ctx); ok {
-		traceId = md.Get(mdKeyTraceId)
+		traceId = md.Get(XMdKeyTraceId)
 	}
-	return l.Logger.Named(LogApp).With(zap.String(logKeyTraceId, traceId))
+	return l.Logger.Named(LogApp).With(zap.String(LogKeyTraceId, traceId))
 }
 
 func (l *Logger) UseSQL(ctx context.Context) *zap.Logger {
 	var traceId string
 	if md, ok := metadata.FromServerContext(ctx); ok {
-		traceId = md.Get(mdKeyTraceId)
+		traceId = md.Get(XMdKeyTraceId)
 	}
-	return l.Logger.Named(LogSQL).With(zap.String(logKeyTraceId, traceId))
+	return l.Logger.Named(LogSQL).With(zap.String(LogKeyTraceId, traceId))
 }
 
 func (l *Logger) UseRequest(ctx context.Context) *zap.Logger {
 	var traceId string
 	if md, ok := metadata.FromServerContext(ctx); ok {
-		traceId = md.Get(mdKeyTraceId)
+		traceId = md.Get(XMdKeyTraceId)
 	}
-	return l.Logger.Named(LogRequest).With(zap.String(logKeyTraceId, traceId))
+	return l.Logger.Named(LogRequest).With(zap.String(LogKeyTraceId, traceId))
 }
 
 type RequestLogFormat struct {
