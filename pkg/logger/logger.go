@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	XMdKeyTraceId = "x-md-trace-id"
+	XMdKeyTraceId = "x-md-global-trace-id"
 	LogKeyTraceId = "trace_id"
 )
 
