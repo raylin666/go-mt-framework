@@ -7,16 +7,22 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/http"
 	"mt/api/v1"
 	"mt/config"
+	"mt/internal/api"
 	"mt/internal/app"
 	"mt/internal/middleware/auth"
 	"mt/internal/middleware/encode"
 	logging "mt/internal/middleware/logger"
 	"mt/internal/middleware/request"
 	"mt/internal/service"
+	netHttp "net/http"
 )
 
 // NewHTTPServer new a HTTP server.
-func NewHTTPServer(c *config.Server, heartbeat *service.HeartbeatService, tools *app.Tools) *http.Server {
+func NewHTTPServer(
+	c *config.Server,
+	heartbeat *service.HeartbeatService,
+	tools *app.Tools,
+	apiHandler *api.Handler) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
@@ -37,7 +43,13 @@ func NewHTTPServer(c *config.Server, heartbeat *service.HeartbeatService, tools 
 	if c.Http.Timeout != nil {
 		opts = append(opts, http.Timeout(c.Http.Timeout.AsDuration()))
 	}
+
 	srv := http.NewServer(opts...)
+
+	// HTTP API 路由处理器
+	srv.HandlePrefix(apiHandler.Prefix, netHttp.Handler(apiHandler.Router()))
+
 	v1.RegisterHeartbeatHTTPServer(srv, heartbeat)
+
 	return srv
 }

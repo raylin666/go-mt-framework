@@ -14,7 +14,10 @@ import (
 )
 
 // NewGRPCServer new a gRPC server.
-func NewGRPCServer(c *config.Server, heartbeat *service.HeartbeatService, tools *app.Tools) *grpc.Server {
+func NewGRPCServer(
+	c *config.Server,
+	heartbeat *service.HeartbeatService,
+	tools *app.Tools) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),

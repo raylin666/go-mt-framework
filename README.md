@@ -52,7 +52,7 @@
 
 <hr />
 
-### 规范约束
+### 规范约束 (DDD 模型)
 
 > `service` 服务层 `对应/对接到 ProtoBuf 协议`, 职责上它只负责 `请求数据规划` 、`调用 biz 业务逻辑层` 及 `包装响应数据`, 不做其他任何逻辑处理。
 
@@ -101,7 +101,7 @@ func JWTMiddlewareHandler(jwt auth.JWT) func(handler middleware.Handler) middlew
 
 ### 数据库模块
 
-> 例如创建个 `account` 模型:
+> 例如创建个 `account` 模型 (目前项目内已存放 `test` 测试模型供参考):
 1. 编写模型文件, 在 `internal/repositories/dbrepo/model` 目录创建 `account.go` 文件, 内容如下:
 
 ```go

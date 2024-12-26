@@ -48,6 +48,7 @@ const (
 	LogApp     = "app"
 	LogSQL     = "sql"
 	LogRequest = "request"
+	LogGrpc    = "grpc"
 )
 
 type Logger struct {
@@ -81,6 +82,14 @@ func (l *Logger) UseRequest(ctx context.Context) *zap.Logger {
 		traceId = md.Get(XMdKeyTraceId)
 	}
 	return l.Logger.Named(LogRequest).With(zap.String(LogKeyTraceId, traceId))
+}
+
+func (l *Logger) UseGrpc(ctx context.Context) *zap.Logger {
+	var traceId string
+	if md, ok := metadata.FromServerContext(ctx); ok {
+		traceId = md.Get(XMdKeyTraceId)
+	}
+	return l.Logger.Named(LogGrpc).With(zap.String(LogKeyTraceId, traceId))
 }
 
 type RequestLogFormat struct {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"mt/internal/app"
 	"mt/internal/biz"
-	"mt/pkg/repositories"
+	"mt/internal/repositories"
 )
 
 type heartbeatRepo struct {
