@@ -38,7 +38,9 @@ enum ErrorReason {
   // 无效ID值
   ID_INVALID_VALUE = 202001 [(errors.code) = 404];
   // 无效的执行指令
-  COMMAND_INVALID_NOT_FOUND = 202002 [(errors.code) = 400];
+  COMMAND_INVALID_NOT_FOUND = 202002 [(errors.code) = 400];// 请求参数错误
+  // 请求参数错误
+  REQUEST_PARAMS = 202003 [(errors.code) = 400];
 
   // 未登录
   NOT_LOGIN = 203001 [(errors.code) = 401];

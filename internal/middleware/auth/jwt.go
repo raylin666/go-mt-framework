@@ -7,7 +7,7 @@ import (
 	"github.com/go-kratos/kratos/v2/transport"
 	"github.com/raylin666/go-utils/auth"
 	"google.golang.org/grpc/metadata"
-	"mt/internal/constant/defined"
+	"mt/errors"
 )
 
 const (
@@ -39,29 +39,29 @@ func JWTMiddlewareHandler(jwt auth.JWT) func(handler middleware.Handler) middlew
 			if md, ok := metadata.FromIncomingContext(ctx); ok {
 				var jwtTokenSlice = md.Get(XMdGlobalJwtName)
 				if len(jwtTokenSlice) <= 0 {
-					return nil, defined.ErrorNotLogin
+					return nil, errors.New().NotLogin()
 				}
 
 				jwtToken = jwtTokenSlice[0]
 			} else if header, ok := transport.FromServerContext(ctx); ok {
 				jwtToken = header.RequestHeader().Get(AccessToken)
 				if len(jwtToken) <= 0 {
-					return nil, defined.ErrorNotLogin
+					return nil, errors.New().NotLogin()
 				}
 			} else {
 				// 缺少可认证的 TOKEN，返回错误
-				return nil, defined.ErrorNotLogin
+				return nil, errors.New().NotLogin()
 			}
 			jwtClaims, err := jwt.ParseToken(jwtToken)
 			if err != nil {
 				// 缺少合法的 TOKEN，返回错误
-				return nil, defined.ErrorNotLogin
+				return nil, errors.New().NotLogin()
 			}
 
 			// 权限验证及保存 Token 到上下文切换
 			var lenAud = len(jwtClaims.Audience)
 			if lenAud <= 0 {
-				return nil, defined.ErrorNotVisitAuth
+				return nil, errors.New().NotVisitAuth()
 			}
 			for i := 0; i < lenAud; i++ {
 				if jwtClaims.Audience[i] == jwtClaims.ID {
@@ -71,7 +71,7 @@ func JWTMiddlewareHandler(jwt auth.JWT) func(handler middleware.Handler) middlew
 				}
 			}
 
-			return nil, defined.ErrorNotVisitAuth
+			return nil, errors.New().NotVisitAuth()
 		}
 	}
 }

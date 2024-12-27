@@ -1,23 +1,25 @@
-# MT 微服务框架 (基于 Kratos)
+# GoMT 微服务框架 (基于 Kratos)
 
 本框架是基于 `Kratos` 进行模块化设计的微服务框架，封装了常用的功能，使用简单，致力于进行快速的业务研发，同时增加了更多限制，约束项目组开发成员，规避混乱无序及自由随意的编码。<br />
 
 提供了方便快捷的 `Makefile` 文件 (帮你快速的生成、构建、执行项目内容)。<br />
 
-当你所需命令不存在时可添加到此文件中, 实现命令统一管理。这也大大的提高了开发者的开发效率, 让开发者更专注于业务代码。 <br />
+当你所需命令太多记不清时, 强烈建议添加到此文件中, 实现命令统一管理。这也大大的提高了开发者的开发效率, 让开发者更专注于业务代码。 <br />
 
 ### 目录介绍
 
-| 目录       | 目录名称     | 目录描述                     |
-|----------|----------|--------------------------|
-| cmd      | 项目启动     | 存放项目启动文件及依赖注入绑定          |
-| config   | 配置文件     | ProtoBuf 协议格式管理配置        |
-| generate | 代码生成器    | 比如数据库查询器                 |
-| internal | 内部文件     | 存放项目业务开发文件               |
-| pkg      | 通用封装包    | 存放项目通用封装逻辑, 代码实现隔离项目内部业务 |
-| static   | 静态文件     | 比如图片、描述性文件、数据库SQL等       |
-| bin      | 运行文件     |                          |
-| runtime  | 临时/暂存 文件 | 比如日志文件                   |
+| 目录       | 目录名称          | 目录描述                                             |
+|----------|---------------|--------------------------------------------------|
+| api      | ProtoBuf 协议定义 | 实际生产环境中, 该目录文件一般会单独包依赖进来                         |
+| cmd      | 项目启动          | 存放项目启动文件及依赖注入绑定                                  |
+| config   | 配置文件          | ProtoBuf 协议格式管理配置                                |
+| errors   | 抛出错误/异常处理文件   | 通过 ProtoBuf 协议格式定义的错误常量统一管理,你也可以自定义实际业务中想要的格式    |
+| generate | 代码生成器         | 例如数据库查询器                                         |
+| internal | 内部文件          | 存放项目业务开发文件                                       |
+| pkg      | 通用封装包         | 存放核心通用封装, 代码实现隔离项目内部业务(即不能调用internal内的所有包, 避免依赖耦合) |
+| static   | 静态文件          | 例如工具、图片、描述性文件、数据库SQL等                            |
+| bin      | 执行/运行文件       |                                                  |
+| runtime  | 临时性/暂存 文件     | 比如日志文件                                           |
 
 ### 下载仓库
 
@@ -58,21 +60,21 @@
 
 > `biz` 逻辑层主要负责 `逻辑分工` 、`数据层调用` 及 `各数据块组装`, 返回给响应数据到服务层。
 
-> `data` 数据层主要处理业务 `数据仓库` 的实例, `数据库逻辑处理`、`缓存逻辑处理`、`RPC 远程调用处理` 等相关操作。
+> `data` 数据层主要处理业务 `数据库逻辑`、`缓存逻辑`、`RPC 远程调用` 等相关操作。
 
 > `pkg` 通用封装包内逻辑不允许调用 `internal` 内部包代码, 实现代码逻辑隔离, 也避免调用外部代码导致耦合和环境污染。
 
-> 异常处理统一调用 `internal/constant/defined/errors.go` 内的变量, 该文件的所有变量都将对接到 `api` 层 `ProtoBuf 协议` 的 `error_reason.proto` 文件定义。
+> 异常处理统一调用 `errors/error.go`, 该文件的错误定义都将对接到 `api` 层 `ProtoBuf 协议` 的 `error_reason.proto` 文件, 新增一个定义增加一个方法即可 (之前的版本中是通过定义一个常量来代表一个错误。考虑到在实际开发中, 经常需要抛出更为详细的错误信息, 所以我将错误处理变得更加的灵活)。
 
 > 调用关系链: (服务层) `service` -> (业务逻辑层) `biz` -> (数据层) `data` , 逻辑代码只能下沉, 注意不要互调哦 ～
 
 ### 创建新模块
 
 > 以 `account` 为例:
-1. 复制 `api/v1/heartbeat.proto` 文件, 重命名为新模块名称, 编写API后执行 `make api` 命令生成API代码文件
-2. 分别复制 `internal/service`, `internal/biz`, `internal/data` 的 `heartbeat.go` 文件处理层级关系链, `internal/service` 下的文件方法对应 `api/v1` 下的服务方法, 参数也是保持一致。
-3. 处理完关系链后分别在 `internal/service/service.go`, `internal/biz/biz.go`, `internal/data/data.go` 文件的 `wire.NewSet` 方法绑定, 然后执行 `make wire` 命令更新依赖注入文件
-4. 分别在 `internal/server/grpc.go` 和 `internal/server/http.go` 的参数添加服务, 然后分别调用类似 `v1.RegisterHeartbeatServer(srv, heartbeat)` 方法和调用 `v1.RegisterHeartbeatHTTPServer(srv, heartbeat)` 方法将服务注册即可～
+1. 复制 `api/v1/heartbeat.proto` 文件, 重命名为新模块名称, 编写API后执行 `make api` 命令生成API代码文件。
+2. 复制 `internal/service`, `internal/biz`, `internal/data` 的 `heartbeat.go` 文件处理层级关系链, `internal/service` 下的文件方法对应 `api/v1` 下的服务方法, 注意参数要保持一致。
+3. 处理完关系链后分别在 `internal/service/service.go`, `internal/biz/biz.go`, `internal/data/data.go` 文件的 `wire.NewSet` 方法添加绑定。
+4. 在 `internal/server/grpc.go` 和 `internal/server/http.go` 的参数中添加服务依赖, 然后分别调用类似 `v1.RegisterHeartbeatServer(srv, heartbeat)` 方法和 `v1.RegisterHeartbeatHTTPServer(srv, heartbeat)` 方法进行服务注册, 最后执行 `make wire` 命令更新依赖注入。
 
 ### JWT 权限验证
 
