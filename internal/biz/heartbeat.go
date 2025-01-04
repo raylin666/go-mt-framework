@@ -3,21 +3,15 @@ package biz
 import (
 	"context"
 	"mt/internal/app"
+	"mt/internal/data"
 )
 
-type Heartbeat struct {
-}
-
-type HeartbeatRepo interface {
-	PONE(context.Context) error
-}
-
 type HeartbeatUsecase struct {
-	repo  HeartbeatRepo
+	repo  data.HeartbeatRepo
 	tools *app.Tools
 }
 
-func NewHeartbeatUsecase(repo HeartbeatRepo, tools *app.Tools) *HeartbeatUsecase {
+func NewHeartbeatUsecase(repo data.HeartbeatRepo, tools *app.Tools) *HeartbeatUsecase {
 	return &HeartbeatUsecase{repo: repo, tools: tools}
 }
 

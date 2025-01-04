@@ -37,7 +37,7 @@ func wireApp(bootstrap *config.Bootstrap, configServer *config.Server, configDat
 		cleanup()
 		return nil, nil, err
 	}
-	handler := api.NewHandler(bootstrap, tools, dataRepo, grpcClient)
+	handler := api.NewHandler(bootstrap, tools, grpcClient)
 	httpServer := server.NewHTTPServer(configServer, heartbeatService, tools, handler)
 	kratosApp := newApp(tools, grpcServer, httpServer)
 	return kratosApp, func() {
