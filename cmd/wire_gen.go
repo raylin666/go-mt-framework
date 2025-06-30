@@ -26,19 +26,19 @@ import (
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(bootstrap *config.Bootstrap, configServer *config.Server, configData *config.Data, tools *app.Tools) (*kratos.App, func(), error) {
-	dataRepo, cleanup := repositories.NewRepositories(configData, tools)
+func wireApp(bootstrap *config.Bootstrap, tools *app.Tools) (*kratos.App, func(), error) {
+	dataRepo, cleanup := repositories.NewRepositories(bootstrap, tools)
 	heartbeatRepo := data.NewHeartbeatRepo(dataRepo, tools)
 	heartbeatUsecase := biz.NewHeartbeatUsecase(heartbeatRepo, tools)
 	heartbeatService := service.NewHeartbeatService(heartbeatUsecase)
-	grpcServer := server.NewGRPCServer(configServer, heartbeatService, tools)
+	grpcServer := server.NewGRPCServer(bootstrap, heartbeatService, tools)
 	grpcClient, cleanup2, err := grpc.NewGrpcClient(tools)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
 	handler := api.NewHandler(bootstrap, tools, grpcClient)
-	httpServer := server.NewHTTPServer(configServer, heartbeatService, tools, handler)
+	httpServer := server.NewHTTPServer(bootstrap, heartbeatService, tools, handler)
 	kratosApp := newApp(tools, grpcServer, httpServer)
 	return kratosApp, func() {
 		cleanup2()

@@ -24,23 +24,23 @@ type DataRepo interface {
 }
 
 type Repositories struct {
-	Db struct {
-		DefaultQuery *query.Query
+	db struct {
+		defaultQuery *query.Query
 	}
-	Redis struct {
-		DefaultClient redis.Client
+	redis struct {
+		defaultClient redis.Client
 	}
 }
 
-func NewRepositories(cData *config.Data, tools *app.Tools) (DataRepo, func()) {
+func NewRepositories(c *config.Bootstrap, tools *app.Tools) (DataRepo, func()) {
 	var (
 		ctx      = context.TODO()
 		dataRepo = new(Repositories)
-		repo     = repositories.NewDataRepo(tools.Logger(), cData)
+		repo     = repositories.NewDataRepo(tools.Logger(), c.Data)
 	)
 
-	dataRepo.Db.DefaultQuery = dbrepo.NewDefaultDbQuery(repo.DbRepo())
-	dataRepo.Redis.DefaultClient = redisrepo.NewDefaultClient(repo.RedisRepo())
+	dataRepo.db.defaultQuery = dbrepo.NewDefaultDbQuery(repo.DbRepo())
+	dataRepo.redis.defaultClient = redisrepo.NewDefaultClient(repo.RedisRepo())
 
 	cleanup := func() {
 		// 资源关闭
@@ -61,11 +61,11 @@ func NewRepositories(cData *config.Data, tools *app.Tools) (DataRepo, func()) {
 func (repositories *Repositories) DefaultDbQuery() *query.Query {
 	//TODO implement me
 
-	return repositories.Db.DefaultQuery
+	return repositories.db.defaultQuery
 }
 
 func (repositories *Repositories) DefaultRedisClient() redis.Client {
 	//TODO implement me
 
-	return repositories.Redis.DefaultClient
+	return repositories.redis.defaultClient
 }

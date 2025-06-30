@@ -110,7 +110,7 @@ func main() {
 	// 创建公共工具实例
 	var tools = app.NewTools(logger, datetime, environment, jwt)
 
-	appMT, cleanup, err := wireApp(&bc, bc.Server, bc.Data, tools)
+	appMT, cleanup, err := wireApp(&bc, tools)
 	if err != nil {
 		panic(err)
 	}
