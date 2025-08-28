@@ -36,7 +36,10 @@ func NewGRPCServer(
 	if c.Server.Grpc.Timeout != nil {
 		opts = append(opts, grpc.Timeout(c.Server.Grpc.Timeout.AsDuration()))
 	}
+
 	srv := grpc.NewServer(opts...)
+
 	v1.RegisterHeartbeatServer(srv, heartbeatService)
+
 	return srv
 }
