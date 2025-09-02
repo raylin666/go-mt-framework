@@ -5,7 +5,7 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/middleware/validate"
 	"github.com/go-kratos/kratos/v2/transport/http"
-	"mt/api/v1"
+	heartbeatPb "mt/api/heartbeat"
 	"mt/config"
 	"mt/internal/api"
 	"mt/internal/app"
@@ -49,7 +49,7 @@ func NewHTTPServer(
 	// HTTP API 路由处理器
 	srv.HandlePrefix(apiHandler.Prefix, netHttp.Handler(apiHandler.Router()))
 
-	v1.RegisterHeartbeatHTTPServer(srv, heartbeatService)
+	heartbeatPb.RegisterHeartbeatHTTPServer(srv, heartbeatService)
 
 	return srv
 }

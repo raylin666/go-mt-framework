@@ -1,17 +1,16 @@
 syntax = "proto3";
 
-package v1;
+package heartbeat;
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
-option go_package = "api/v1;v1";
+option go_package = "api/heartbeat;heartbeat";
 
-// kratos proto client api/v1/heartbeat.proto
+// kratos proto client api/heartbeat/heartbeat.proto
 
 // The Heartbeat service definition.
 service Heartbeat {
-  // Heartbeat detection
   rpc PONE (google.protobuf.Empty) returns (PONEResponse) {
     option (google.api.http) = {
       get: "/heartbeat"

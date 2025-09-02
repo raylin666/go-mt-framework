@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "v1/heartbeat.proto",
+    "title": "heartbeat/heartbeat.proto",
     "version": "version not set"
   },
   "tags": [
@@ -18,13 +18,12 @@
   "paths": {
     "/heartbeat": {
       "get": {
-        "summary": "Heartbeat detection",
         "operationId": "Heartbeat_PONE",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1PONEResponse"
+              "$ref": "#/definitions/heartbeatPONEResponse"
             }
           },
           "default": {
@@ -41,6 +40,14 @@
     }
   },
   "definitions": {
+    "heartbeatPONEResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
+    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -66,14 +73,6 @@
             "type": "object",
             "$ref": "#/definitions/protobufAny"
           }
-        }
-      }
-    },
-    "v1PONEResponse": {
-      "type": "object",
-      "properties": {
-        "message": {
-          "type": "string"
         }
       }
     }

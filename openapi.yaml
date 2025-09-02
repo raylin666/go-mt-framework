@@ -11,7 +11,6 @@ paths:
         get:
             tags:
                 - Heartbeat
-            description: Heartbeat detection
             operationId: Heartbeat_PONE
             responses:
                 "200":
@@ -19,10 +18,10 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/v1.PONEResponse'
+                                $ref: '#/components/schemas/heartbeat.PONEResponse'
 components:
     schemas:
-        v1.PONEResponse:
+        heartbeat.PONEResponse:
             type: object
             properties:
                 message:

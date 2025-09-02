@@ -4,7 +4,7 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/metadata"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
-	"mt/api/v1"
+	heartbeatPb "mt/api/heartbeat"
 	"mt/config"
 	"mt/internal/app"
 	"mt/internal/middleware/auth"
@@ -39,7 +39,7 @@ func NewGRPCServer(
 
 	srv := grpc.NewServer(opts...)
 
-	v1.RegisterHeartbeatServer(srv, heartbeatService)
+	heartbeatPb.RegisterHeartbeatServer(srv, heartbeatService)
 
 	return srv
 }

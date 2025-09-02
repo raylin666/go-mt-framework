@@ -6,15 +6,15 @@ import (
 	"github.com/raylin666/go-utils/server/system"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	pb "mt/api/v1"
+	heartbeatPb "mt/api/heartbeat"
 	"mt/internal/app"
 	"mt/pkg/logger"
 )
 
-var _ GrpcClient = (*Client)(nil)
+var _ ClientInterface = (*Client)(nil)
 
-type GrpcClient interface {
-	Heartbeat() pb.HeartbeatClient
+type ClientInterface interface {
+	Heartbeat() heartbeatPb.HeartbeatClient
 }
 
 type Client struct {
@@ -24,10 +24,10 @@ type Client struct {
 
 	connects []*grpc.ClientConn
 
-	heartbeatClient pb.HeartbeatClient
+	heartbeatClient heartbeatPb.HeartbeatClient
 }
 
-func NewGrpcClient(tools *app.Tools) (grpcClient GrpcClient, cleanup func(), err error) {
+func NewGrpcClient(tools *app.Tools) (grpcClient ClientInterface, cleanup func(), err error) {
 	var client = &Client{
 		ctx:         context.TODO(),
 		environment: tools.Environment(),
@@ -53,7 +53,7 @@ func (client *Client) connect() error {
 		return err
 	}
 	client.connects = append(client.connects, heartbeatClientConn)
-	client.heartbeatClient = pb.NewHeartbeatClient(heartbeatClientConn)
+	client.heartbeatClient = heartbeatPb.NewHeartbeatClient(heartbeatClientConn)
 	client.logger.UseGrpc(client.ctx).Info(fmt.Sprintf("The heartbeat service client `%s` connected successfully.", heartbeatEndpoint))
 
 	return nil
@@ -70,7 +70,7 @@ func (client *Client) getHeartbeatEndpoint() string {
 	return HeartbeatGrpcClientEndpoint
 }
 
-func (client *Client) Heartbeat() pb.HeartbeatClient {
+func (client *Client) Heartbeat() heartbeatPb.HeartbeatClient {
 	//TODO implement me
 
 	return client.heartbeatClient

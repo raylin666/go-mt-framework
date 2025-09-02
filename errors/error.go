@@ -3,7 +3,7 @@ package errors
 import (
 	"fmt"
 	"github.com/go-kratos/kratos/v2/errors"
-	pb "mt/api/v1"
+	errorsPb "mt/api/errors"
 )
 
 type Option func(opt *option)
@@ -36,7 +36,7 @@ func (err *Error) Unknown(args ...interface{}) *errors.Error {
 		err.format = fmt.Sprintf("%s: %s", format, err.format)
 	}
 
-	return pb.ErrorUnknown(err.format, args...)
+	return errorsPb.ErrorUnknown(err.format, args...)
 }
 
 func (err *Error) Server(args ...interface{}) *errors.Error {
@@ -45,7 +45,7 @@ func (err *Error) Server(args ...interface{}) *errors.Error {
 		err.format = fmt.Sprintf("%s: %s", format, err.format)
 	}
 
-	return pb.ErrorServer(err.format, args...)
+	return errorsPb.ErrorServer(err.format, args...)
 }
 
 func (err *Error) DataValidate(args ...interface{}) *errors.Error {
@@ -54,7 +54,7 @@ func (err *Error) DataValidate(args ...interface{}) *errors.Error {
 		err.format = fmt.Sprintf("%s: %s", format, err.format)
 	}
 
-	return pb.ErrorDataValidate(err.format, args...)
+	return errorsPb.ErrorDataValidate(err.format, args...)
 }
 
 func (err *Error) DataSelect(args ...interface{}) *errors.Error {
@@ -63,7 +63,7 @@ func (err *Error) DataSelect(args ...interface{}) *errors.Error {
 		err.format = fmt.Sprintf("%s: %s", format, err.format)
 	}
 
-	return pb.ErrorDataSelect(err.format, args...)
+	return errorsPb.ErrorDataSelect(err.format, args...)
 }
 
 func (err *Error) DataAlreadyExists(args ...interface{}) *errors.Error {
@@ -72,7 +72,7 @@ func (err *Error) DataAlreadyExists(args ...interface{}) *errors.Error {
 		err.format = fmt.Sprintf("%s: %s", format, err.format)
 	}
 
-	return pb.ErrorDataAlreadyExists(err.format, args...)
+	return errorsPb.ErrorDataAlreadyExists(err.format, args...)
 }
 
 func (err *Error) DataNotFound(args ...interface{}) *errors.Error {
@@ -81,7 +81,7 @@ func (err *Error) DataNotFound(args ...interface{}) *errors.Error {
 		err.format = fmt.Sprintf("%s: %s", format, err.format)
 	}
 
-	return pb.ErrorDataNotFound(err.format, args...)
+	return errorsPb.ErrorDataNotFound(err.format, args...)
 }
 
 func (err *Error) DataAdd(args ...interface{}) *errors.Error {
@@ -90,7 +90,7 @@ func (err *Error) DataAdd(args ...interface{}) *errors.Error {
 		err.format = fmt.Sprintf("%s: %s", format, err.format)
 	}
 
-	return pb.ErrorDataAdd(err.format, args...)
+	return errorsPb.ErrorDataAdd(err.format, args...)
 }
 
 func (err *Error) DataUpdate(args ...interface{}) *errors.Error {
@@ -99,7 +99,7 @@ func (err *Error) DataUpdate(args ...interface{}) *errors.Error {
 		err.format = fmt.Sprintf("%s: %s", format, err.format)
 	}
 
-	return pb.ErrorDataUpdate(err.format, args...)
+	return errorsPb.ErrorDataUpdate(err.format, args...)
 }
 
 func (err *Error) DataDelete(args ...interface{}) *errors.Error {
@@ -108,7 +108,7 @@ func (err *Error) DataDelete(args ...interface{}) *errors.Error {
 		err.format = fmt.Sprintf("%s: %s", format, err.format)
 	}
 
-	return pb.ErrorDataDelete(err.format, args...)
+	return errorsPb.ErrorDataDelete(err.format, args...)
 }
 
 func (err *Error) DataResourceNotFound(args ...interface{}) *errors.Error {
@@ -117,7 +117,7 @@ func (err *Error) DataResourceNotFound(args ...interface{}) *errors.Error {
 		err.format = fmt.Sprintf("%s: %s", format, err.format)
 	}
 
-	return pb.ErrorDataResourceNotFound(err.format, args...)
+	return errorsPb.ErrorDataResourceNotFound(err.format, args...)
 }
 
 func (err *Error) DataUpdateField(args ...interface{}) *errors.Error {
@@ -126,7 +126,7 @@ func (err *Error) DataUpdateField(args ...interface{}) *errors.Error {
 		err.format = fmt.Sprintf("%s: %s", format, err.format)
 	}
 
-	return pb.ErrorDataUpdateField(err.format, args...)
+	return errorsPb.ErrorDataUpdateField(err.format, args...)
 }
 
 func (err *Error) IdInvalidValue(args ...interface{}) *errors.Error {
@@ -135,7 +135,7 @@ func (err *Error) IdInvalidValue(args ...interface{}) *errors.Error {
 		err.format = fmt.Sprintf("%s: %s", format, err.format)
 	}
 
-	return pb.ErrorIdInvalidValue(err.format, args...)
+	return errorsPb.ErrorIdInvalidValue(err.format, args...)
 }
 
 func (err *Error) CommandInvalidNotFound(args ...interface{}) *errors.Error {
@@ -144,7 +144,7 @@ func (err *Error) CommandInvalidNotFound(args ...interface{}) *errors.Error {
 		err.format = fmt.Sprintf("%s: %s", format, err.format)
 	}
 
-	return pb.ErrorCommandInvalidNotFound(err.format, args...)
+	return errorsPb.ErrorCommandInvalidNotFound(err.format, args...)
 }
 
 func (err *Error) RequestParams(args ...interface{}) *errors.Error {
@@ -153,7 +153,7 @@ func (err *Error) RequestParams(args ...interface{}) *errors.Error {
 		err.format = fmt.Sprintf("%s: %s", format, err.format)
 	}
 
-	return pb.ErrorRequestParams(err.format, args...)
+	return errorsPb.ErrorRequestParams(err.format, args...)
 }
 
 func (err *Error) NotLogin(args ...interface{}) *errors.Error {
@@ -162,7 +162,7 @@ func (err *Error) NotLogin(args ...interface{}) *errors.Error {
 		err.format = fmt.Sprintf("%s: %s", format, err.format)
 	}
 
-	return pb.ErrorNotLogin(err.format, args...)
+	return errorsPb.ErrorNotLogin(err.format, args...)
 }
 
 func (err *Error) NotVisitAuth(args ...interface{}) *errors.Error {
@@ -171,5 +171,5 @@ func (err *Error) NotVisitAuth(args ...interface{}) *errors.Error {
 		err.format = fmt.Sprintf("%s: %s", format, err.format)
 	}
 
-	return pb.ErrorNotVisitAuth(err.format, args...)
+	return errorsPb.ErrorNotVisitAuth(err.format, args...)
 }
