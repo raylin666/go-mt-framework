@@ -14,7 +14,16 @@ func WithMessage(format string) Option {
 	}
 }
 
-type option struct{ format string }
+func IsAdd(is bool) Option {
+	return func(opt *option) {
+		opt.isAdd = is
+	}
+}
+
+type option struct {
+	format string
+	isAdd  bool
+}
 
 func Is(err, target error) bool { return errors.Is(err, target) }
 
@@ -30,146 +39,78 @@ func New(opts ...Option) *Error {
 	return err
 }
 
-func (err *Error) Unknown(args ...interface{}) *errors.Error {
-	var format = "未知错误"
+func getFormat(err *Error, format string) string {
 	if len(err.format) > 0 {
-		err.format = fmt.Sprintf("%s: %s", format, err.format)
+		if err.isAdd {
+			format = fmt.Sprintf("%s: %s", format, err.format)
+		} else {
+			format = err.format
+		}
 	}
 
-	return errorsPb.ErrorUnknown(err.format, args...)
+	return format
+}
+
+func (err *Error) Unknown(args ...interface{}) *errors.Error {
+	return errorsPb.ErrorUnknown(getFormat(err, "未知错误"), args...)
 }
 
 func (err *Error) Server(args ...interface{}) *errors.Error {
-	var format = "服务异常"
-	if len(err.format) > 0 {
-		err.format = fmt.Sprintf("%s: %s", format, err.format)
-	}
-
-	return errorsPb.ErrorServer(err.format, args...)
+	return errorsPb.ErrorServer(getFormat(err, "服务异常"), args...)
 }
 
 func (err *Error) DataValidate(args ...interface{}) *errors.Error {
-	var format = "数据校验失败"
-	if len(err.format) > 0 {
-		err.format = fmt.Sprintf("%s: %s", format, err.format)
-	}
-
-	return errorsPb.ErrorDataValidate(err.format, args...)
+	return errorsPb.ErrorDataValidate(getFormat(err, "数据校验失败"), args...)
 }
 
 func (err *Error) DataSelect(args ...interface{}) *errors.Error {
-	var format = "数据查询失败"
-	if len(err.format) > 0 {
-		err.format = fmt.Sprintf("%s: %s", format, err.format)
-	}
-
-	return errorsPb.ErrorDataSelect(err.format, args...)
+	return errorsPb.ErrorDataSelect(getFormat(err, "数据查询失败"), args...)
 }
 
 func (err *Error) DataAlreadyExists(args ...interface{}) *errors.Error {
-	var format = "数据已存在"
-	if len(err.format) > 0 {
-		err.format = fmt.Sprintf("%s: %s", format, err.format)
-	}
-
-	return errorsPb.ErrorDataAlreadyExists(err.format, args...)
+	return errorsPb.ErrorDataAlreadyExists(getFormat(err, "数据已存在"), args...)
 }
 
 func (err *Error) DataNotFound(args ...interface{}) *errors.Error {
-	var format = "数据不存在"
-	if len(err.format) > 0 {
-		err.format = fmt.Sprintf("%s: %s", format, err.format)
-	}
-
-	return errorsPb.ErrorDataNotFound(err.format, args...)
+	return errorsPb.ErrorDataNotFound(getFormat(err, "数据不存在"), args...)
 }
 
 func (err *Error) DataAdd(args ...interface{}) *errors.Error {
-	var format = "新增数据失败"
-	if len(err.format) > 0 {
-		err.format = fmt.Sprintf("%s: %s", format, err.format)
-	}
-
-	return errorsPb.ErrorDataAdd(err.format, args...)
+	return errorsPb.ErrorDataAdd(getFormat(err, "新增数据失败"), args...)
 }
 
 func (err *Error) DataUpdate(args ...interface{}) *errors.Error {
-	var format = "更新数据失败"
-	if len(err.format) > 0 {
-		err.format = fmt.Sprintf("%s: %s", format, err.format)
-	}
-
-	return errorsPb.ErrorDataUpdate(err.format, args...)
+	return errorsPb.ErrorDataUpdate(getFormat(err, "更新数据失败"), args...)
 }
 
 func (err *Error) DataDelete(args ...interface{}) *errors.Error {
-	var format = "数据删除失败"
-	if len(err.format) > 0 {
-		err.format = fmt.Sprintf("%s: %s", format, err.format)
-	}
-
-	return errorsPb.ErrorDataDelete(err.format, args...)
+	return errorsPb.ErrorDataDelete(getFormat(err, "数据删除失败"), args...)
 }
 
 func (err *Error) DataResourceNotFound(args ...interface{}) *errors.Error {
-	var format = "数据资源不存在"
-	if len(err.format) > 0 {
-		err.format = fmt.Sprintf("%s: %s", format, err.format)
-	}
-
-	return errorsPb.ErrorDataResourceNotFound(err.format, args...)
+	return errorsPb.ErrorDataResourceNotFound(getFormat(err, "数据资源不存在"), args...)
 }
 
 func (err *Error) DataUpdateField(args ...interface{}) *errors.Error {
-	var format = "数据属性更新失败"
-	if len(err.format) > 0 {
-		err.format = fmt.Sprintf("%s: %s", format, err.format)
-	}
-
-	return errorsPb.ErrorDataUpdateField(err.format, args...)
+	return errorsPb.ErrorDataUpdateField(getFormat(err, "数据属性更新失败"), args...)
 }
 
 func (err *Error) IdInvalidValue(args ...interface{}) *errors.Error {
-	var format = "无效ID值"
-	if len(err.format) > 0 {
-		err.format = fmt.Sprintf("%s: %s", format, err.format)
-	}
-
-	return errorsPb.ErrorIdInvalidValue(err.format, args...)
+	return errorsPb.ErrorIdInvalidValue(getFormat(err, "无效ID值"), args...)
 }
 
 func (err *Error) CommandInvalidNotFound(args ...interface{}) *errors.Error {
-	var format = "无效的执行指令"
-	if len(err.format) > 0 {
-		err.format = fmt.Sprintf("%s: %s", format, err.format)
-	}
-
-	return errorsPb.ErrorCommandInvalidNotFound(err.format, args...)
+	return errorsPb.ErrorCommandInvalidNotFound(getFormat(err, "无效的执行指令"), args...)
 }
 
 func (err *Error) RequestParams(args ...interface{}) *errors.Error {
-	var format = "请求参数错误"
-	if len(err.format) > 0 {
-		err.format = fmt.Sprintf("%s: %s", format, err.format)
-	}
-
-	return errorsPb.ErrorRequestParams(err.format, args...)
+	return errorsPb.ErrorRequestParams(getFormat(err, "请求参数错误"), args...)
 }
 
 func (err *Error) NotLogin(args ...interface{}) *errors.Error {
-	var format = "未登录帐号"
-	if len(err.format) > 0 {
-		err.format = fmt.Sprintf("%s: %s", format, err.format)
-	}
-
-	return errorsPb.ErrorNotLogin(err.format, args...)
+	return errorsPb.ErrorNotLogin(getFormat(err, "未登录帐号"), args...)
 }
 
 func (err *Error) NotVisitAuth(args ...interface{}) *errors.Error {
-	var format = "没有访问权限"
-	if len(err.format) > 0 {
-		err.format = fmt.Sprintf("%s: %s", format, err.format)
-	}
-
-	return errorsPb.ErrorNotVisitAuth(err.format, args...)
+	return errorsPb.ErrorNotVisitAuth(getFormat(err, "没有访问权限"), args...)
 }
