@@ -103,8 +103,8 @@ type RequestLogFormat struct {
 	RequestBodyData   string              `json:"request_body_data"`
 	RequestHeaderData map[string][]string `json:"request_header_data"`
 	HttpCode          int                 `json:"http_code"`
-	BusinessCode      int                 `json:"business_code"`
 	BusinessMessage   string              `json:"business_message"`
+	BusinessReason    string              `json:"business_reason"`
 	Args              string              `json:"args"`
 	RequestTime       time.Time           `json:"request_time"`
 	ResponseTime      time.Time           `json:"response_time"`

@@ -17,6 +17,7 @@ func Server(log *pkgLogger.Logger) middleware.Middleware {
 		return func(ctx context.Context, req interface{}) (reply interface{}, err error) {
 			var (
 				code      int32
+				message   string
 				reason    string
 				operation string
 				headers   = make(map[string][]string)
@@ -31,6 +32,7 @@ func Server(log *pkgLogger.Logger) middleware.Middleware {
 			reply, err = handler(ctx, req)
 			if se := errors.FromError(err); se != nil {
 				code = se.Code
+				message = se.Message
 				reason = se.Reason
 			}
 
@@ -45,8 +47,8 @@ func Server(log *pkgLogger.Logger) middleware.Middleware {
 				RequestTime:       startTime,
 				ResponseTime:      time.Now(),
 				HttpCode:          int(code),
-				BusinessCode:      int(code),
-				BusinessMessage:   reason,
+				BusinessMessage:   message,
+				BusinessReason:    reason,
 				CostSeconds:       time.Since(startTime).Seconds(),
 			}, err)
 			return
@@ -60,6 +62,7 @@ func Client(log *pkgLogger.Logger) middleware.Middleware {
 		return func(ctx context.Context, req interface{}) (reply interface{}, err error) {
 			var (
 				code      int32
+				message   string
 				reason    string
 				operation string
 				headers   = make(map[string][]string)
@@ -74,6 +77,7 @@ func Client(log *pkgLogger.Logger) middleware.Middleware {
 			reply, err = handler(ctx, req)
 			if se := errors.FromError(err); se != nil {
 				code = se.Code
+				message = se.Message
 				reason = se.Reason
 			}
 
@@ -88,8 +92,8 @@ func Client(log *pkgLogger.Logger) middleware.Middleware {
 				RequestTime:       startTime,
 				ResponseTime:      time.Now(),
 				HttpCode:          int(code),
-				BusinessCode:      int(code),
-				BusinessMessage:   reason,
+				BusinessMessage:   message,
+				BusinessReason:    reason,
 				CostSeconds:       time.Since(startTime).Seconds(),
 			}, err)
 			return
